@@ -1,0 +1,29 @@
+[package]
+name = "adbhub-relay-client"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Outbound QUIC Relay client for ADBHUB-LINK Agent and Desktop with RTT telemetry and URB stream bridging"
+
+[dependencies]
+adbhub-core.workspace = true
+adbhub-relay-protocol.workspace = true
+adbhub-secure-transport.workspace = true
+adbhub-usb-exporter.workspace = true
+adbhub-usbip-adapter.workspace = true
+adbhub-usbip-client-adapter.workspace = true
+chrono.workspace = true
+quinn.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+uuid.workspace = true
+
+[dev-dependencies]
+adbhub-relay-service.workspace = true
+
+[lints]
+workspace = true
+

@@ -1,0 +1,22 @@
+[package]
+name = "adbhub-session-manager"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Session lifecycle manager, approval workflow, and Relay token issuer for ADBHUB-LINK"
+
+[dependencies]
+adbhub-core.workspace = true
+adbhub-device-broker.workspace = true
+adbhub-device-registry.workspace = true
+adbhub-relay-protocol.workspace = true
+chrono.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+uuid.workspace = true
+
+[lints]
+workspace = true

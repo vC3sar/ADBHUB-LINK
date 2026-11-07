@@ -1,0 +1,17 @@
+[package]
+name = "adbhub-device-broker"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Exclusive USB device lock broker and permission verifier for ADBHUB-LINK"
+
+[dependencies]
+adbhub-core.workspace = true
+serde.workspace = true
+tokio.workspace = true
+uuid.workspace = true
+
+[lints]
+workspace = true
+

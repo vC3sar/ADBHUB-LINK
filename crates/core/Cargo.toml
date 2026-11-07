@@ -1,0 +1,21 @@
+[package]
+name = "adbhub-core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Core USB domain models, multi-protocol classifier, descriptors, and lifecycle states for ADBHUB-LINK"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+sha2.workspace = true
+hex.workspace = true
+tracing.workspace = true
+
+[lints]
+workspace = true
+

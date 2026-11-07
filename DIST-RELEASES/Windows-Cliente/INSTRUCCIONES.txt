@@ -1,0 +1,18 @@
+================================================================================
+ ADBHUB-LINK — ESTACIÓN DEL CLIENTE (WINDOWS)
+================================================================================
+
+DESCRIPCIÓN:
+Aplicación de escritorio nativa para el Cliente remoto.
+Detecta el teléfono conectado por cable USB y genera un código AnyDesk seguro
+para entregárselo al técnico.
+
+INSTRUCCIONES:
+1. Conecta el teléfono por cable USB a la computadora.
+2. Activa "Depuración USB" en Ajustes > Opciones de desarrollador.
+3. Ejecuta "adbhub-agent.exe" (Hacer doble clic, no abre consolas).
+4. Dale el código en pantalla al técnico.
+5. Si el teléfono pide permiso en pantalla, marca "Permitir siempre desde esta
+   computadora" y pulsa Aceptar.
+================================================================================
+

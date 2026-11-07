@@ -1,0 +1,27 @@
+[package]
+name = "adbhub-usbip-client-adapter"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Technician-side USB/IP VHCI (usbip-win2 UDE) client adapter and local bridge listener for ADBHUB-LINK"
+
+[dependencies]
+adbhub-core.workspace = true
+adbhub-usb-exporter.workspace = true
+adbhub-usbip-adapter.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+uuid.workspace = true
+
+[dev-dependencies]
+adbhub-usb-discovery.workspace = true
+adbhub-usb-enumerator.workspace = true
+adbhub-usb-monitor.workspace = true
+chrono.workspace = true
+
+[lints]
+workspace = true
+

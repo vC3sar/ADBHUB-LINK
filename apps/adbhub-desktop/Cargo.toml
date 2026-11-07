@@ -1,0 +1,45 @@
+[package]
+name = "adbhub-desktop"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "ADBHUB-LINK Technician Desktop application backend (Tauri 2 / Native Web UI + VHCI USB/IP Controller)"
+
+[[bin]]
+name = "adbhub-desktop"
+path = "src/main.rs"
+
+[lib]
+name = "adbhub_desktop"
+path = "src/lib.rs"
+
+[dependencies]
+adbhub-api-service.workspace = true
+adbhub-audit.workspace = true
+adbhub-auth.workspace = true
+adbhub-core.workspace = true
+adbhub-device-broker.workspace = true
+adbhub-device-registry.workspace = true
+adbhub-relay-client.workspace = true
+adbhub-relay-protocol.workspace = true
+adbhub-session-manager.workspace = true
+adbhub-usb-discovery.workspace = true
+adbhub-usb-enumerator.workspace = true
+adbhub-usb-exporter.workspace = true
+adbhub-usb-monitor.workspace = true
+adbhub-usbip-adapter.workspace = true
+adbhub-usbip-client-adapter.workspace = true
+axum.workspace = true
+chrono.workspace = true
+eframe = "0.37.0"
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+uuid.workspace = true
+
+[lints]
+workspace = true

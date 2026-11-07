@@ -1,0 +1,21 @@
+[package]
+name = "adbhub-device-registry"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Cloud Agent & USB Device Registry for ADBHUB-LINK Control Plane"
+
+[dependencies]
+adbhub-core.workspace = true
+chrono.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+uuid.workspace = true
+
+[lints]
+workspace = true
+

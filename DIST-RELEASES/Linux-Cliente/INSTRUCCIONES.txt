@@ -1,0 +1,19 @@
+================================================================================
+ ADBHUB-LINK — CLIENTE PARA LINUX / LUBUNTU / UBUNTU
+================================================================================
+
+DESCRIPCIÓN:
+Cliente ligero con puente ADB USB para sistemas Linux.
+
+OPCIONES DE USO (1 SOLO CLIC):
+1. Si es la primera vez que se usa en el equipo:
+   bash install-linux.sh
+   (Instala dependencias, reglas udev y crea acceso directo en el escritorio).
+
+2. Para iniciar en cualquier momento:
+   Hacer doble clic en "ADBHUB-Cliente.desktop" en el escritorio
+   O en terminal: ./iniciar-cliente.sh
+
+3. Comparte la IP:5555 o el código AnyDesk mostrado con el técnico.
+================================================================================
+

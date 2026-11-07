@@ -1,0 +1,98 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/core",
+    "crates/usb-enumerator",
+    "crates/usb-discovery",
+    "crates/usb-monitor",
+    "crates/usbip-adapter",
+    "crates/usb-exporter",
+    "crates/usbip-client-adapter",
+    "crates/relay-protocol",
+    "crates/secure-transport",
+    "crates/relay-client",
+    "crates/auth",
+    "crates/audit",
+    "crates/device-registry",
+    "crates/device-broker",
+    "crates/session-manager",
+    "services/relay",
+    "services/api",
+    "apps/adbhub-agent",
+    "apps/adbhub-desktop",
+    "apps/adbhub-installer",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.80"
+authors = ["ADBHUB-LINK Senior Engineering Team"]
+license = "Proprietary"
+repository = "https://github.com/adbhub-link/adbhub-link"
+
+[workspace.dependencies]
+# Internal workspace crates
+adbhub-core = { path = "crates/core" }
+adbhub-usb-enumerator = { path = "crates/usb-enumerator" }
+adbhub-usb-discovery = { path = "crates/usb-discovery" }
+adbhub-usb-monitor = { path = "crates/usb-monitor" }
+adbhub-usbip-adapter = { path = "crates/usbip-adapter" }
+adbhub-usb-exporter = { path = "crates/usb-exporter" }
+adbhub-usbip-client-adapter = { path = "crates/usbip-client-adapter" }
+adbhub-relay-protocol = { path = "crates/relay-protocol" }
+adbhub-secure-transport = { path = "crates/secure-transport" }
+adbhub-relay-client = { path = "crates/relay-client" }
+adbhub-auth = { path = "crates/auth" }
+adbhub-audit = { path = "crates/audit" }
+adbhub-device-registry = { path = "crates/device-registry" }
+adbhub-device-broker = { path = "crates/device-broker" }
+adbhub-session-manager = { path = "crates/session-manager" }
+adbhub-relay-service = { path = "services/relay" }
+adbhub-api-service = { path = "services/api" }
+
+# Async runtime & utilities
+tokio = { version = "1.40", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "2.0"
+uuid = { version = "1.10", features = ["v4", "v5", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+sha2 = "0.10"
+hmac = "0.12"
+hex = "0.4"
+
+# HTTP REST & WebSocket (Axum / Tower)
+axum = { version = "0.8", features = ["ws", "macros", "json"] }
+tower = { version = "0.5", features = ["util"] }
+http-body-util = "0.1"
+
+# QUIC & TLS 1.3 Transport
+quinn = "0.11"
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+rcgen = "0.13"
+
+# Logging & Telemetry
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json", "fmt"] }
+
+# Windows Native APIs (SetupAPI, CfgMgr32, USB IOCTLs, Win32 Foundation)
+windows-sys = { version = "0.59", features = [
+    "Win32_Foundation",
+    "Win32_Devices_DeviceAndDriverInstallation",
+    "Win32_Devices_Usb",
+    "Win32_Devices_Properties",
+    "Win32_System_IO",
+    "Win32_System_Registry",
+    "Win32_Storage_FileSystem",
+    "Win32_Security",
+] }
+
+[workspace.lints.rust]
+unsafe_op_in_unsafe_fn = "warn"
+unused_must_use = "deny"
+
+[workspace.lints.clippy]
+unwrap_used = "warn"
+expect_used = "warn"
+

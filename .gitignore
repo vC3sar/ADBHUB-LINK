@@ -1,0 +1,28 @@
+# Rust build artifacts
+/target/
+**/*.rs.bk
+Cargo.lock.orig
+
+# Python cache & bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# Package staging (dist temporary unpack directory)
+dist/ADBHUB-LINK/
+
+# OS and Editor junk
+Thumbs.db
+[Dd]esktop.ini
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.bak
+*.tmp
+

@@ -1,0 +1,20 @@
+[package]
+name = "adbhub-usb-enumerator"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Windows USB device enumerator using SetupAPI, CfgMgr32, USB Hub IOCTLs, and usbipd-win state integration"
+
+[dependencies]
+adbhub-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+uuid.workspace = true
+windows-sys.workspace = true
+
+[lints]
+workspace = true
+

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADBHUB-LINK Desktop — Plataforma de USB Passthrough Remoto</title>
+  <style>
+    :root {
+      --bg-primary: #0f1216;
+      --bg-panel: #161b22;
+      --bg-row-hover: #1c222b;
+      --border: #2a313c;
+      --text-main: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #2f81f7;
+      --success: #238636;
+      --warning: #d29922;
+      --danger: #da3633;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: "Cascadia Code", "Consolas", "JetBrains Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background-color: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand h1 {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+    }
+
+    .brand span {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 2px 6px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 12px;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--success);
+      margin-right: 6px;
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .metric-card {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 14px 16px;
+    }
+
+    .metric-label {
+      color: var(--text-muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .metric-value {
+      font-size: 22px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      margin-top: 4px;
+    }
+
+    .panel {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-title {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    tr:hover td {
+      background-color: var(--bg-row-hover);
+    }
+
+    .mono {
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      border-radius: 3px;
+      border: 1px solid var(--border);
+    }
+
+    .badge-adb { color: #58a6ff; border-color: #1f6feb; background: #121d2f; }
+    .badge-mtp { color: #3fb950; border-color: #238636; background: #12261e; }
+    .badge-edl { color: #f85149; border-color: #da3633; background: #2d1418; }
+    .badge-mtk { color: #d2a8ff; border-color: #8957e5; background: #211832; }
+    .badge-spd { color: #e3b341; border-color: #9e6a03; background: #292112; }
+    .badge-samsung { color: #79c0ff; border-color: #388bfd; background: #10243f; }
+    .badge-unknown { color: var(--text-muted); border-color: var(--border); }
+
+    button {
+      background-color: #21262d;
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #30363d;
+    }
+
+    .btn-primary {
+      background-color: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #1f6feb;
+    }
+
+    .btn-danger {
+      background-color: var(--danger);
+      border-color: var(--danger);
+      color: #ffffff;
+    }
+
+    .session-box {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .session-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .samsung-odin-panel {
+      margin-top: 14px;
+      padding: 14px;
+      background-color: #111924;
+      border: 1px solid #1f6feb;
+      border-radius: 4px;
+    }
+
+    .samsung-odin-title {
+      font-weight: 700;
+      color: #79c0ff;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+
+    .warning-banner {
+      margin-top: 10px;
+      padding: 10px 12px;
+      background-color: #2b1d11;
+      border: 1px solid var(--warning);
+      color: #f0b72f;
+      font-weight: 600;
+      border-radius: 3px;
+    }
+
+    .events-list {
+      padding: 12px 16px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .events-list div {
+      padding: 4px 0;
+      border-bottom: 1px solid #1f242c;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h1>ADBHUB-LINK DESKTOP</h1>
+      <span>USB/IP + QUIC RELAY PASSTHROUGH</span>
+    </div>
+    <div class="status-bar">
+      <div><span class="status-dot"></span><span id="conn-status">Cargando estado...</span></div>
+      <button onclick="rescanBus()">Reescanear Bus USB</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Dashboard Metrics -->
+    <section class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Equipos Anfitriones</div>
+        <div class="metric-value" id="m-agents">0</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Dispositivos Detectados</div>
+        <div class="metric-value" id="m-devices">0</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Sesiones USB Activas</div>
+        <div class="metric-value" id="m-sessions">0</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Almacenamiento Local</div>
+        <div class="metric-value" style="font-size: 14px; margin-top: 9px;">Archivos JSON / JSONL</div>
+      </div>
+    </section>
+
+    <!-- Dispositivos Disponibles -->
+    <section class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Dispositivos USB Remotos y Locales</div>
+        <span class="mono" style="color: var(--text-muted)">ADB · MTP · Qualcomm EDL · MediaTek BROM · SPD/Unisoc · Samsung Download (Odin)</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>BUSID</th>
+            <th>Nombre del Dispositivo</th>
+            <th>Fabricante</th>
+            <th>VID:PID</th>
+            <th>Modo USB</th>
+            <th>Estado</th>
+            <th>Disponibilidad</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody id="devices-tbody"></tbody>
+      </table>
+    </section>
+
+    <!-- Sesiones Activas + Panel Especial Samsung Download Mode -->
+    <section class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Sesiones USB/IP Activas y Diagnóstico en Tiempo Real</div>
+      </div>
+      <div id="active-sessions-container">
+        <div style="padding: 16px; color: var(--text-muted);">No hay sesiones USB remotas activas. Seleccione "Conectar" en un dispositivo compartido.</div>
+      </div>
+    </section>
+
+    <!-- Últimos Eventos -->
+    <section class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Últimos Eventos de Sesión y Auditoría</div>
+      </div>
+      <div class="events-list" id="events-log"></div>
+    </section>
+  </main>
+
+  <script>
+    function modeBadgeClass(mode) {
+      switch (mode) {
+        case "AndroidAdb":
+        case "CompositeAdbMtp":
+        case "Fastboot":
+          return "badge badge-adb";
+        case "Mtp":
+          return "badge badge-mtp";
+        case "QualcommEdl":
+          return "badge badge-edl";
+        case "MediatekBrom":
+        case "MediatekPreloader":
+          return "badge badge-mtk";
+        case "SpdUnisoc":
+          return "badge badge-spd";
+        case "SamsungDownload":
+          return "badge badge-samsung";
+        default:
+          return "badge badge-unknown";
+      }
+    }
+
+    function modeDisplayLabel(mode) {
+      switch (mode) {
+        case "AndroidAdb": return "Android / ADB";
+        case "CompositeAdbMtp": return "Android / ADB + MTP";
+        case "Mtp": return "MTP";
+        case "QualcommEdl": return "Qualcomm EDL";
+        case "MediatekBrom": return "MediaTek BROM";
+        case "MediatekPreloader": return "MediaTek Preloader";
+        case "SpdUnisoc": return "SPD / Unisoc";
+        case "SamsungDownload": return "Samsung Download Mode";
+        default: return "Unknown USB Device";
+      }
+    }
+
+    function hex4(n) {
+      return n.toString(16).toUpperCase().padStart(4, "0");
+    }
+
+    async function loadSnapshot() {
+      const res = await fetch("/api/desktop/snapshot");
+      const data = await res.json();
+      renderDashboard(data);
+    }
+
+    async function rescanBus() {
+      const res = await fetch("/api/desktop/rescan", { method: "POST" });
+      const data = await res.json();
+      renderDashboard(data);
+    }
+
+    async function connectDevice(deviceId) {
+      const res = await fetch(`/api/desktop/connect/${deviceId}`, { method: "POST" });
+      if (!res.ok) {
+        const err = await res.json();
+        alert("Error al conectar dispositivo: " + err.error);
+      }
+      await loadSnapshot();
+    }
+
+    async function disconnectSession(sessionId, force) {
+      const res = await fetch(`/api/desktop/disconnect/${sessionId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ force: !!force })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        if (err.requires_force_confirmation) {
+          const confirmForce = confirm(
+            err.error + "\n\n¿Desea forzar la desconexión inmediata bajo su responsabilidad?"
+          );
+          if (confirmForce) {
+            return disconnectSession(sessionId, true);
+          }
+        } else {
+          alert("Error: " + err.error);
+        }
+      }
+      await loadSnapshot();
+    }
+
+    function renderDashboard(data) {
+      document.getElementById("conn-status").textContent = data.connection_status;
+      document.getElementById("m-agents").textContent = data.available_agents_count;
+      document.getElementById("m-devices").textContent = data.connected_devices_count;
+      document.getElementById("m-sessions").textContent = data.active_sessions_count;
+
+      const tbody = document.getElementById("devices-tbody");
+      tbody.innerHTML = "";
+      for (const dev of data.devices) {
+        const busStr = `${dev.busid.bus}-${dev.busid.port_chain.join(".")}`;
+        const vidPid = `${hex4(dev.vendor_id)}:${hex4(dev.product_id)}`;
+        const tr = document.createElement("tr");
+        const isAvailable = dev.device_state !== "ACTIVE";
+        tr.innerHTML = `
+          <td class="mono">${busStr}</td>
+          <td><strong>${dev.product_name}</strong></td>
+          <td>${dev.manufacturer}</td>
+          <td class="mono">${vidPid}</td>
+          <td><span class="${modeBadgeClass(dev.usb_mode)}">${modeDisplayLabel(dev.usb_mode)}</span></td>
+          <td class="mono">${dev.device_state}</td>
+          <td>${isAvailable ? "Disponible" : "En uso exclusivo"}</td>
+          <td>
+            ${isAvailable
+              ? `<button class="btn-primary" onclick="connectDevice('${dev.id}')">Conectar</button>`
+              : `<button disabled>Ocupado</button>`
+            }
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      const sessContainer = document.getElementById("active-sessions-container");
+      if (!data.active_sessions || data.active_sessions.length === 0) {
+        sessContainer.innerHTML = `<div style="padding: 16px; color: var(--text-muted);">No hay sesiones USB remotas activas. Seleccione "Conectar" en un dispositivo compartido.</div>`;
+      } else {
+        sessContainer.innerHTML = "";
+        for (const s of data.active_sessions) {
+          let samsungHtml = "";
+          if (s.samsung_download_panel) {
+            const p = s.samsung_download_panel;
+            samsungHtml = `
+              <div class="samsung-odin-panel">
+                <div class="samsung-odin-title">PANEL DE DIAGNÓSTICO SAMSUNG DOWNLOAD MODE (ODIN)</div>
+                <div class="session-grid">
+                  <div><span class="metric-label">Fabricante</span><div>${p.manufacturer}</div></div>
+                  <div><span class="metric-label">Modo</span><div>${p.mode}</div></div>
+                  <div><span class="metric-label">Estado USB</span><div class="mono">${p.usb_state}</div></div>
+                  <div><span class="metric-label">Driver Detectado</span><div class="mono">${p.detected_driver}</div></div>
+                  <div><span class="metric-label">Estado de Exportación</span><div class="mono">${p.export_status}</div></div>
+                  <div><span class="metric-label">Conexión PC Técnico</span><div>${p.technician_pc_connection_status}</div></div>
+                  <div><span class="metric-label">Compatibilidad Odin</span><div class="mono" style="color: var(--warning); font-weight:700;">${p.odin_compatibility}</div></div>
+                </div>
+                <div class="warning-banner">${p.flashing_warning}</div>
+              </div>
+            `;
+          }
+
+          const div = document.createElement("div");
+          div.className = "session-box";
+          div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <div>
+                <strong>${s.device_name}</strong>
+                <span class="mono" style="margin-left:8px; color:var(--text-muted)">(${s.vid_pid})</span>
+                <span class="${modeBadgeClass(s.usb_mode)}" style="margin-left:8px;">${s.usb_mode_label}</span>
+              </div>
+              <button class="btn-danger" onclick="disconnectSession('${s.session_id}', false)">Desconectar</button>
+            </div>
+            <div class="session-grid">
+              <div><span class="metric-label">Equipo Anfitrión / Propietario</span><div>${s.host_machine} (${s.owner_email})</div></div>
+              <div><span class="metric-label">Latencia RTT</span><div class="mono">${s.latency_ms} ms</div></div>
+              <div><span class="metric-label">Velocidad de Transferencia</span><div class="mono">${s.transfer_rate_kbps} KB/s</div></div>
+              <div><span class="metric-label">URBs Completados / Estado</span><div class="mono">${s.urbs_completed} URBs (${s.state})</div></div>
+            </div>
+            ${samsungHtml}
+          `;
+          sessContainer.appendChild(div);
+        }
+      }
+
+      const evLog = document.getElementById("events-log");
+      evLog.innerHTML = data.recent_events.map(e => `<div>${e}</div>`).join("");
+    }
+
+    loadSnapshot();
+  </script>
+</body>
+</html>
+

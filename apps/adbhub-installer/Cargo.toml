@@ -1,0 +1,16 @@
+[package]
+name = "adbhub-installer"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "ADBHUB-LINK Standalone Windows Setup Executable (.exe)"
+
+[[bin]]
+name = "Setup"
+path = "src/main.rs"
+
+[dependencies]
+
+[lints]
+workspace = true

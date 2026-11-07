@@ -1,0 +1,41 @@
+[package]
+name = "adbhub-api-service"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "ADBHUB-LINK Cloud Control Plane REST API and WebSocket Signaling Server built on Axum"
+
+[[bin]]
+name = "adbhub-api"
+path = "src/main.rs"
+
+[lib]
+name = "adbhub_api_service"
+path = "src/lib.rs"
+
+[dependencies]
+adbhub-audit.workspace = true
+adbhub-auth.workspace = true
+adbhub-core.workspace = true
+adbhub-device-broker.workspace = true
+adbhub-device-registry.workspace = true
+adbhub-relay-protocol.workspace = true
+adbhub-session-manager.workspace = true
+axum.workspace = true
+chrono.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+uuid.workspace = true
+
+[dev-dependencies]
+http-body-util.workspace = true
+tower.workspace = true
+
+[lints]
+workspace = true
+

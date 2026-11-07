@@ -1,0 +1,21 @@
+[package]
+name = "adbhub-usb-monitor"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "USB Hotplug monitor and Device Lifecycle Manager with multi-protocol reenumeration recovery for ADBHUB-LINK"
+
+[dependencies]
+adbhub-core.workspace = true
+adbhub-usb-discovery.workspace = true
+adbhub-usb-enumerator.workspace = true
+chrono.workspace = true
+serde.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+uuid.workspace = true
+
+[lints]
+workspace = true
+

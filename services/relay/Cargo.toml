@@ -1,0 +1,35 @@
+[package]
+name = "adbhub-relay-service"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Centralized QUIC Relay server for ADBHUB-LINK with token auth, replay protection, stream pairing, and backpressure"
+
+[[bin]]
+name = "adbhub-relay"
+path = "src/main.rs"
+
+[lib]
+name = "adbhub_relay_service"
+path = "src/lib.rs"
+
+[dependencies]
+adbhub-core.workspace = true
+adbhub-relay-protocol.workspace = true
+adbhub-secure-transport.workspace = true
+adbhub-usb-exporter.workspace = true
+adbhub-usbip-adapter.workspace = true
+chrono.workspace = true
+quinn.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+uuid.workspace = true
+
+[lints]
+workspace = true
+

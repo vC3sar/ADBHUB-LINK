@@ -1,0 +1,18 @@
+================================================================================
+ ADBHUB-LINK — ESTACIÓN DEL TÉCNICO (WINDOWS)
+================================================================================
+
+DESCRIPCIÓN:
+Aplicación de escritorio nativa para el Técnico. Conéctate a cualquier teléfono
+remoto a través del código AnyDesk o la IP:puerto del cliente sin necesidad
+de instalar drivers de kernel.
+
+INSTRUCCIONES:
+1. Ejecuta "adbhub-desktop.exe" (Hacer doble clic, no abre consolas).
+2. Pide al cliente su código AnyDesk o su IP:puerto (ej. 192.168.1.83:5555).
+3. Ingrésalo en la casilla y haz clic en "⚡ CONECTAR".
+4. El dispositivo quedará montado directamente en tu servidor local de ADB.
+5. Puedes usar la consola integrada, UnlockTool, Chimera, SamFirm, PowerShell,
+   CMD o cualquier software que requiera acceso ADB.
+================================================================================
+

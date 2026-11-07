@@ -1,0 +1,475 @@
+{
+  "agents": [
+    {
+      "id": "f96147c7-0521-4ab1-b91f-bec514855300",
+      "owner_id": "2362e69f-54f0-417e-9324-0c2141373916",
+      "hostname": "DESKTOP-G6R9V8A",
+      "platform": "Windows 10/11 x64",
+      "version": "0.1.0",
+      "online": true,
+      "last_seen": "2026-11-07T19:46:47.262955700Z",
+      "agent_public_key": "ed25519:local-host-agent-key"
+    }
+  ],
+  "devices": [
+    {
+      "id": "e42c6a8e-9123-4ade-9e14-28091c92aa47",
+      "agent_id": "f96147c7-0521-4ab1-b91f-bec514855300",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2
+        ]
+      },
+      "vendor_id": 1256,
+      "product_id": 26720,
+      "manufacturer": "SAMSUNG Electronics Co., Ltd.",
+      "product_name": "SAMSUNG Mobile USB Composite Device",
+      "serial_hash": "d5bf8f25f621b76ee3e2e1cca6576100d3503d12308da4216b9e390fd48b9578",
+      "interface_descriptors": [],
+      "device_state": "DISCONNECTED",
+      "usb_mode": "Mtp",
+      "odin_compatibility": "Unknown",
+      "online": false,
+      "shared": true,
+      "updated_at": "2026-11-07T19:46:47.262955700Z"
+    },
+    {
+      "id": "d5d9d24d-40e2-4032-b0f7-b26479d47fd5",
+      "agent_id": "f96147c7-0521-4ab1-b91f-bec514855300",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2,
+          2
+        ]
+      },
+      "vendor_id": 1256,
+      "product_id": 26720,
+      "manufacturer": "Samsung Electronics",
+      "product_name": "MTP",
+      "serial_hash": null,
+      "interface_descriptors": [],
+      "device_state": "SHARED",
+      "usb_mode": "Mtp",
+      "odin_compatibility": "Unknown",
+      "online": true,
+      "shared": true,
+      "updated_at": "2026-11-07T17:18:08.925435700Z"
+    },
+    {
+      "id": "225da0fe-2fc5-4fd4-beea-9016c06b4e18",
+      "agent_id": "f96147c7-0521-4ab1-b91f-bec514855300",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2,
+          2
+        ]
+      },
+      "vendor_id": 1256,
+      "product_id": 26720,
+      "manufacturer": "SAMSUNG Electronics Co., Ltd.",
+      "product_name": "SAMSUNG Mobile USB Modem #8",
+      "serial_hash": null,
+      "interface_descriptors": [],
+      "device_state": "SHARED",
+      "usb_mode": "Mtp",
+      "odin_compatibility": "Unknown",
+      "online": true,
+      "shared": true,
+      "updated_at": "2026-11-07T17:17:50.707023600Z"
+    },
+    {
+      "id": "b69b3129-3644-43ed-b199-c75a8f9bffdf",
+      "agent_id": "f96147c7-0521-4ab1-b91f-bec514855300",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2,
+          2
+        ]
+      },
+      "vendor_id": 1256,
+      "product_id": 26720,
+      "manufacturer": "SAMSUNG Electronics Co., Ltd.",
+      "product_name": "SAMSUNG Mobile USB Modem #8",
+      "serial_hash": null,
+      "interface_descriptors": [],
+      "device_state": "DISCONNECTED",
+      "usb_mode": "Mtp",
+      "odin_compatibility": "Unknown",
+      "online": false,
+      "shared": true,
+      "updated_at": "2026-11-07T18:11:08.864919100Z"
+    },
+    {
+      "id": "8aebd482-693d-4416-bc6f-fc6c23013082",
+      "agent_id": "f96147c7-0521-4ab1-b91f-bec514855300",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2,
+          2
+        ]
+      },
+      "vendor_id": 1256,
+      "product_id": 26720,
+      "manufacturer": "SAMSUNG Electronics Co., Ltd.",
+      "product_name": "SAMSUNG Mobile USB Modem #8",
+      "serial_hash": null,
+      "interface_descriptors": [],
+      "device_state": "DISCONNECTED",
+      "usb_mode": "Mtp",
+      "odin_compatibility": "Unknown",
+      "online": false,
+      "shared": true,
+      "updated_at": "2026-11-07T17:58:01.777311500Z"
+    },
+    {
+      "id": "a41d989e-cdf7-431f-9189-6377239066c5",
+      "agent_id": "f96147c7-0521-4ab1-b91f-bec514855300",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2,
+          2
+        ]
+      },
+      "vendor_id": 1256,
+      "product_id": 26720,
+      "manufacturer": "SAMSUNG Electronics Co., Ltd.",
+      "product_name": "SAMSUNG Mobile USB Modem #8",
+      "serial_hash": null,
+      "interface_descriptors": [],
+      "device_state": "SHARED",
+      "usb_mode": "Mtp",
+      "odin_compatibility": "Unknown",
+      "online": true,
+      "shared": true,
+      "updated_at": "2026-11-07T17:18:19.928440300Z"
+    },
+    {
+      "id": "7a8824ef-4a3e-4622-9f08-61d0e1d4b5c6",
+      "agent_id": "f96147c7-0521-4ab1-b91f-bec514855300",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2,
+          2
+        ]
+      },
+      "vendor_id": 1256,
+      "product_id": 26720,
+      "manufacturer": "Samsung Electronics",
+      "product_name": "MTP",
+      "serial_hash": null,
+      "interface_descriptors": [],
+      "device_state": "SHARED",
+      "usb_mode": "Mtp",
+      "odin_compatibility": "Unknown",
+      "online": true,
+      "shared": true,
+      "updated_at": "2026-11-07T17:17:48.826231500Z"
+    },
+    {
+      "id": "d8d12d68-48f0-4549-a07d-9c43f7a0a87d",
+      "agent_id": "f96147c7-0521-4ab1-b91f-bec514855300",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2,
+          2
+        ]
+      },
+      "vendor_id": 1256,
+      "product_id": 26720,
+      "manufacturer": "Samsung Electronics",
+      "product_name": "MTP",
+      "serial_hash": null,
+      "interface_descriptors": [],
+      "device_state": "SHARED",
+      "usb_mode": "Mtp",
+      "odin_compatibility": "Unknown",
+      "online": true,
+      "shared": true,
+      "updated_at": "2026-11-07T19:24:26.074404400Z"
+    },
+    {
+      "id": "d9ffada0-9d2b-4fc3-9ce8-815b153e930e",
+      "agent_id": "f96147c7-0521-4ab1-b91f-bec514855300",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2,
+          2
+        ]
+      },
+      "vendor_id": 1256,
+      "product_id": 26720,
+      "manufacturer": "SAMSUNG Electronics Co., Ltd.",
+      "product_name": "SAMSUNG Mobile USB Modem #8",
+      "serial_hash": null,
+      "interface_descriptors": [],
+      "device_state": "SHARED",
+      "usb_mode": "Mtp",
+      "odin_compatibility": "Unknown",
+      "online": true,
+      "shared": true,
+      "updated_at": "2026-11-07T17:17:47.488345900Z"
+    },
+    {
+      "id": "ec034a59-476a-42ac-a834-6ff4b621a772",
+      "agent_id": "f96147c7-0521-4ab1-b91f-bec514855300",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2,
+          2
+        ]
+      },
+      "vendor_id": 1256,
+      "product_id": 26720,
+      "manufacturer": "SAMSUNG Electronics Co., Ltd.",
+      "product_name": "SAMSUNG Mobile USB Modem #8",
+      "serial_hash": null,
+      "interface_descriptors": [],
+      "device_state": "DISCONNECTED",
+      "usb_mode": "Mtp",
+      "odin_compatibility": "Unknown",
+      "online": false,
+      "shared": true,
+      "updated_at": "2026-11-07T18:40:21.422029900Z"
+    },
+    {
+      "id": "60a33c55-48f6-4299-a7ab-669f841bfcee",
+      "agent_id": "f96147c7-0521-4ab1-b91f-bec514855300",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2,
+          2
+        ]
+      },
+      "vendor_id": 1256,
+      "product_id": 26720,
+      "manufacturer": "SAMSUNG Electronics Co., Ltd.",
+      "product_name": "SAMSUNG Mobile USB Modem #8",
+      "serial_hash": null,
+      "interface_descriptors": [],
+      "device_state": "DISCONNECTED",
+      "usb_mode": "Mtp",
+      "odin_compatibility": "Unknown",
+      "online": false,
+      "shared": true,
+      "updated_at": "2026-11-07T18:21:47.369778200Z"
+    },
+    {
+      "id": "ece38132-1030-44a9-8434-1f14618f1c86",
+      "agent_id": "f96147c7-0521-4ab1-b91f-bec514855300",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2,
+          2
+        ]
+      },
+      "vendor_id": 1256,
+      "product_id": 26720,
+      "manufacturer": "Samsung Electronics",
+      "product_name": "MTP",
+      "serial_hash": null,
+      "interface_descriptors": [],
+      "device_state": "SHARED",
+      "usb_mode": "Mtp",
+      "odin_compatibility": "Unknown",
+      "online": true,
+      "shared": true,
+      "updated_at": "2026-11-07T17:17:40.142287300Z"
+    },
+    {
+      "id": "2b66d2ac-5da4-46bf-ae06-17812585abf2",
+      "agent_id": "f96147c7-0521-4ab1-b91f-bec514855300",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2,
+          2
+        ]
+      },
+      "vendor_id": 1256,
+      "product_id": 26720,
+      "manufacturer": "Samsung Electronics",
+      "product_name": "MTP",
+      "serial_hash": null,
+      "interface_descriptors": [],
+      "device_state": "SHARED",
+      "usb_mode": "Mtp",
+      "odin_compatibility": "Unknown",
+      "online": true,
+      "shared": true,
+      "updated_at": "2026-11-07T17:29:38.188715200Z"
+    },
+    {
+      "id": "6207ac83-a5a3-43ac-b170-ed42b232323b",
+      "agent_id": "f96147c7-0521-4ab1-b91f-bec514855300",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2,
+          2
+        ]
+      },
+      "vendor_id": 1256,
+      "product_id": 26720,
+      "manufacturer": "Samsung Electronics",
+      "product_name": "MTP",
+      "serial_hash": null,
+      "interface_descriptors": [],
+      "device_state": "SHARED",
+      "usb_mode": "Mtp",
+      "odin_compatibility": "Unknown",
+      "online": true,
+      "shared": true,
+      "updated_at": "2026-11-07T17:18:19.927085700Z"
+    },
+    {
+      "id": "f95334af-04fd-4ac6-a826-564b6502edc2",
+      "agent_id": "f96147c7-0521-4ab1-b91f-bec514855300",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2,
+          2
+        ]
+      },
+      "vendor_id": 1256,
+      "product_id": 26720,
+      "manufacturer": "SAMSUNG Electronics Co., Ltd.",
+      "product_name": "SAMSUNG Mobile USB Modem #8",
+      "serial_hash": null,
+      "interface_descriptors": [],
+      "device_state": "SHARED",
+      "usb_mode": "Mtp",
+      "odin_compatibility": "Unknown",
+      "online": true,
+      "shared": true,
+      "updated_at": "2026-11-07T17:17:50.090741300Z"
+    },
+    {
+      "id": "72ea8c3e-08f9-476a-a089-e17e6afc637d",
+      "agent_id": "f96147c7-0521-4ab1-b91f-bec514855300",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2,
+          2
+        ]
+      },
+      "vendor_id": 1256,
+      "product_id": 26720,
+      "manufacturer": "SAMSUNG Electronics Co., Ltd.",
+      "product_name": "SAMSUNG Mobile USB Modem #8",
+      "serial_hash": null,
+      "interface_descriptors": [],
+      "device_state": "SHARED",
+      "usb_mode": "Mtp",
+      "odin_compatibility": "Unknown",
+      "online": true,
+      "shared": true,
+      "updated_at": "2026-11-07T17:17:48.827548300Z"
+    },
+    {
+      "id": "523949ae-b5f7-415f-bede-5d45ae4f99ad",
+      "agent_id": "f96147c7-0521-4ab1-b91f-bec514855300",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2,
+          2
+        ]
+      },
+      "vendor_id": 1256,
+      "product_id": 26720,
+      "manufacturer": "SAMSUNG Electronics Co., Ltd.",
+      "product_name": "SAMSUNG Mobile USB Modem #8",
+      "serial_hash": null,
+      "interface_descriptors": [],
+      "device_state": "SHARED",
+      "usb_mode": "Mtp",
+      "odin_compatibility": "Unknown",
+      "online": true,
+      "shared": true,
+      "updated_at": "2026-11-07T19:24:26.075414700Z"
+    },
+    {
+      "id": "f21a5793-2e85-498d-939d-068b288feb6f",
+      "agent_id": "f96147c7-0521-4ab1-b91f-bec514855300",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2,
+          2
+        ]
+      },
+      "vendor_id": 1256,
+      "product_id": 26720,
+      "manufacturer": "SAMSUNG Electronics Co., Ltd.",
+      "product_name": "SAMSUNG Mobile USB Modem #8",
+      "serial_hash": null,
+      "interface_descriptors": [],
+      "device_state": "SHARED",
+      "usb_mode": "Mtp",
+      "odin_compatibility": "Unknown",
+      "online": true,
+      "shared": true,
+      "updated_at": "2026-11-07T17:29:38.190241600Z"
+    },
+    {
+      "id": "5b3bdd9e-e9cd-4127-9117-cee88ecd46c6",
+      "agent_id": "f96147c7-0521-4ab1-b91f-bec514855300",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2,
+          2
+        ]
+      },
+      "vendor_id": 1256,
+      "product_id": 26720,
+      "manufacturer": "SAMSUNG Electronics Co., Ltd.",
+      "product_name": "SAMSUNG Mobile USB Modem #8",
+      "serial_hash": null,
+      "interface_descriptors": [],
+      "device_state": "DISCONNECTED",
+      "usb_mode": "Mtp",
+      "odin_compatibility": "Unknown",
+      "online": false,
+      "shared": true,
+      "updated_at": "2026-11-07T18:05:18.969814800Z"
+    },
+    {
+      "id": "5a0cc75f-19f0-4137-b1f9-b2b693230c26",
+      "agent_id": "f96147c7-0521-4ab1-b91f-bec514855300",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2,
+          2
+        ]
+      },
+      "vendor_id": 1256,
+      "product_id": 26720,
+      "manufacturer": "SAMSUNG Electronics Co., Ltd.",
+      "product_name": "SAMSUNG Mobile USB Modem #8",
+      "serial_hash": null,
+      "interface_descriptors": [],
+      "device_state": "DISCONNECTED",
+      "usb_mode": "Mtp",
+      "odin_compatibility": "Unknown",
+      "online": false,
+      "shared": true,
+      "updated_at": "2026-11-07T19:46:47.262955700Z"
+    }
+  ]
+}
