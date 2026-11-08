@@ -456,18 +456,18 @@ def start_gui(code, local_ip):
                 mono_font = candidate
                 break
 
-        # Tipografía responsiva autoadaptativa
-        f_title = tkfont.Font(family=prop_font, size=14, weight="bold")
-        f_hero_name = tkfont.Font(family=prop_font, size=13, weight="bold")
-        f_header = tkfont.Font(family=prop_font, size=10, weight="bold")
-        f_badge = tkfont.Font(family=prop_font, size=9, weight="bold")
-        f_body = tkfont.Font(family=prop_font, size=9)
-        f_body_bold = tkfont.Font(family=prop_font, size=9, weight="bold")
-        f_caption = tkfont.Font(family=prop_font, size=8)
-        f_caption_bold = tkfont.Font(family=prop_font, size=8, weight="bold")
-        f_code_hero = tkfont.Font(family=mono_font, size=15, weight="bold")
-        f_code_sub = tkfont.Font(family=mono_font, size=9, weight="bold")
-        f_mono_specs = tkfont.Font(family=mono_font, size=10)
+        # Tipografía responsiva autoadaptativa - Escala Centralizada Design System
+        f_title = tkfont.Font(family=prop_font, size=16, weight="bold")
+        f_hero_name = tkfont.Font(family=prop_font, size=14, weight="bold")
+        f_header = tkfont.Font(family=prop_font, size=12, weight="bold")
+        f_badge = tkfont.Font(family=prop_font, size=10, weight="bold")
+        f_body = tkfont.Font(family=prop_font, size=11)
+        f_body_bold = tkfont.Font(family=prop_font, size=11, weight="bold")
+        f_caption = tkfont.Font(family=prop_font, size=10)
+        f_caption_bold = tkfont.Font(family=prop_font, size=10, weight="bold")
+        f_code_hero = tkfont.Font(family=mono_font, size=18, weight="bold")
+        f_code_sub = tkfont.Font(family=mono_font, size=11, weight="bold")
+        f_mono_specs = tkfont.Font(family=mono_font, size=11)
 
         _last_scale = [1.0]
 
@@ -475,21 +475,21 @@ def start_gui(code, local_ip):
             if event.widget != root:
                 return
             w = max(640, event.width)
-            scale = round(max(0.90, min(1.30, w / 960.0)), 2)
-            if abs(scale - _last_scale[0]) < 0.06:
+            scale = round(max(0.95, min(1.30, w / 960.0)), 2)
+            if abs(scale - _last_scale[0]) < 0.05:
                 return
             _last_scale[0] = scale
-            f_title.configure(size=int(round(14 * scale)))
-            f_hero_name.configure(size=int(round(13 * scale)))
-            f_header.configure(size=int(round(10 * scale)))
-            f_badge.configure(size=int(round(9 * scale)))
-            f_body.configure(size=int(round(9 * scale)))
-            f_body_bold.configure(size=int(round(9 * scale)))
-            f_caption.configure(size=int(round(8 * scale)))
-            f_caption_bold.configure(size=int(round(8 * scale)))
-            f_code_hero.configure(size=int(round(15 * scale)))
-            f_code_sub.configure(size=int(round(9 * scale)))
-            f_mono_specs.configure(size=int(round(10 * scale)))
+            f_title.configure(size=max(14, int(round(16 * scale))))
+            f_hero_name.configure(size=max(13, int(round(14 * scale))))
+            f_header.configure(size=max(11, int(round(12 * scale))))
+            f_badge.configure(size=max(10, int(round(10 * scale))))
+            f_body.configure(size=max(10, int(round(11 * scale))))
+            f_body_bold.configure(size=max(10, int(round(11 * scale))))
+            f_caption.configure(size=max(9, int(round(10 * scale))))
+            f_caption_bold.configure(size=max(9, int(round(10 * scale))))
+            f_code_hero.configure(size=max(16, int(round(18 * scale))))
+            f_code_sub.configure(size=max(10, int(round(11 * scale))))
+            f_mono_specs.configure(size=max(10, int(round(11 * scale))))
 
         root.bind("<Configure>", on_window_resize)
 

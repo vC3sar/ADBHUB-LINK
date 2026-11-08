@@ -36,6 +36,41 @@ const STATUS_GREEN_BG: Color32 = Color32::from_rgb(6, 58, 43);
 const STATUS_AMBER: Color32 = Color32::from_rgb(245, 158, 11); // #F59E0B
 const STATUS_AMBER_BG: Color32 = Color32::from_rgb(69, 39, 7);
 
+// Escala Tipográfica Responsive Estandarizada
+pub const TYPO_DISPLAY: f32 = 32.0;
+pub const TYPO_PAGE_TITLE: f32 = 28.0;
+pub const TYPO_SECTION_TITLE: f32 = 22.0;
+pub const TYPO_SUBSECTION: f32 = 18.0;
+pub const TYPO_BODY_LARGE: f32 = 16.0;
+pub const TYPO_BODY: f32 = 15.0;
+pub const TYPO_BODY_SMALL: f32 = 14.0;
+pub const TYPO_BUTTON: f32 = 14.5;
+pub const TYPO_LABEL: f32 = 13.0;
+pub const TYPO_INPUT: f32 = 15.5;
+pub const TYPO_MONO_CODE: f32 = 20.0;
+
+// Grid de Espaciado (múltiplos de 4)
+pub const SPACE_1: f32 = 4.0;
+pub const SPACE_2: f32 = 8.0;
+pub const SPACE_3: f32 = 12.0;
+pub const SPACE_4: f32 = 16.0;
+pub const SPACE_5: f32 = 20.0;
+pub const SPACE_6: f32 = 24.0;
+pub const SPACE_8: f32 = 32.0;
+
+pub const SPACE_XS: f32 = 4.0;
+pub const SPACE_SM: f32 = 8.0;
+pub const SPACE_MD: f32 = 16.0;
+pub const SPACE_LG: f32 = 24.0;
+pub const SPACE_XL: f32 = 32.0;
+
+// Radii de Superficie y Componentes
+pub const RADIUS_NONE: u8 = 0;
+pub const RADIUS_SMALL: u8 = 4;
+pub const RADIUS_MEDIUM: u8 = 6;
+pub const RADIUS_LARGE: u8 = 8;
+pub const RADIUS_FULL: u8 = 99;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum ClientTab {
     Tutorial,
@@ -452,10 +487,10 @@ impl AgentGuiApp {
         Frame::new()
             .fill(bg)
             .stroke(Stroke::new(1.0, fg))
-            .corner_radius(CornerRadius::same(4))
-            .inner_margin(Margin::symmetric(7, 2))
+            .corner_radius(CornerRadius::same(RADIUS_SMALL))
+            .inner_margin(Margin::symmetric(SPACE_SM as i8, SPACE_XS as i8))
             .show(ui, |ui| {
-                ui.label(RichText::new(text).size(10.0).strong().color(fg));
+                ui.label(RichText::new(text).size(TYPO_LABEL).strong().color(fg));
             });
     }
 
@@ -468,13 +503,13 @@ impl AgentGuiApp {
                 Frame::new()
                     .fill(BG_CARD)
                     .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-                    .corner_radius(CornerRadius::same(8))
-                    .inner_margin(Margin::same(12))
+                    .corner_radius(CornerRadius::same(RADIUS_LARGE))
+                    .inner_margin(Margin::same(SPACE_MD as i8))
                     .show(ui, |ui| {
                         ui.set_width(ui.available_width());
                         ui.label(
                             RichText::new("CREDENCIALES DE ESTA ESTACIÓN")
-                                .size(10.5)
+                                .size(TYPO_LABEL)
                                 .strong()
                                 .color(TEXT_SECONDARY),
                         );
@@ -482,30 +517,30 @@ impl AgentGuiApp {
                             RichText::new(
                                 "Comparta este código o IP con su técnico para autorizar el soporte.",
                             )
-                            .size(11.0)
+                            .size(TYPO_BODY_SMALL)
                             .color(TEXT_MUTED),
                         );
-                        ui.add_space(6.0);
+                        ui.add_space(SPACE_SM);
 
                         // Recessed Code Display Box
                         Frame::new()
                             .fill(BG_RECESSED)
                             .stroke(Stroke::new(1.0, Color32::from_rgb(38, 56, 84)))
-                            .corner_radius(CornerRadius::same(6))
-                            .inner_margin(Margin::symmetric(10, 10))
+                            .corner_radius(CornerRadius::same(RADIUS_MEDIUM))
+                            .inner_margin(Margin::symmetric(SPACE_MD as i8, SPACE_SM as i8))
                             .show(ui, |ui| {
                                 ui.set_width(ui.available_width());
                                 ui.vertical_centered(|ui| {
                                     ui.label(
                                         RichText::new("CÓDIGO DE EMPAREJAMIENTO")
-                                            .size(9.5)
+                                            .size(TYPO_LABEL)
                                             .strong()
                                             .color(TEXT_MUTED),
                                     );
-                                    ui.add_space(2.0);
+                                    ui.add_space(SPACE_XS);
                                     ui.label(
                                         RichText::new(self.code.as_str())
-                                            .size(18.5)
+                                            .size(TYPO_MONO_CODE)
                                             .strong()
                                             .monospace()
                                             .color(BORDER_ACCENT),
@@ -513,17 +548,17 @@ impl AgentGuiApp {
                                 });
                             });
 
-                        ui.add_space(6.0);
+                        ui.add_space(SPACE_SM);
 
                         let copy_btn = egui::Button::new(
                             RichText::new("COPIAR CÓDIGO DE ESTACIÓN")
-                                .size(11.5)
+                                .size(TYPO_BUTTON)
                                 .strong()
                                 .color(Color32::WHITE),
                         )
                         .fill(ACCENT_BLUE_DARK)
                         .stroke(Stroke::new(1.0, ACCENT_BLUE))
-                        .min_size(Vec2::new(ui.available_width(), 30.0));
+                        .min_size(Vec2::new(ui.available_width(), 36.0));
 
                         if ui.add(copy_btn).clicked() {
                             ui.ctx().copy_text(self.code.as_str().to_string());
@@ -531,12 +566,12 @@ impl AgentGuiApp {
                                 "Código de estación copiado al portapapeles.".to_string();
                         }
 
-                        ui.add_space(4.0);
+                        ui.add_space(SPACE_XS);
                         ui.columns(2, |cols| {
                             if cols[0]
                                 .add_sized(
-                                    [cols[0].available_width(), 25.0],
-                                    egui::Button::new(RichText::new("Nuevo ID").size(11.0)),
+                                    [cols[0].available_width(), 30.0],
+                                    egui::Button::new(RichText::new("Nuevo ID").size(TYPO_LABEL)),
                                 )
                                 .clicked()
                             {
@@ -556,8 +591,8 @@ impl AgentGuiApp {
                             }
                             if cols[1]
                                 .add_sized(
-                                    [cols[1].available_width(), 25.0],
-                                    egui::Button::new(RichText::new("9 Dígitos").size(11.0)),
+                                    [cols[1].available_width(), 30.0],
+                                    egui::Button::new(RichText::new("9 Dígitos").size(TYPO_LABEL)),
                                 )
                                 .clicked()
                             {
@@ -568,29 +603,29 @@ impl AgentGuiApp {
                             }
                         });
 
-                        ui.add_space(8.0);
+                        ui.add_space(SPACE_SM);
                         ui.separator();
-                        ui.add_space(4.0);
+                        ui.add_space(SPACE_XS);
 
                         let endpoint = format!("{}:5555", self.local_ip);
                         ui.horizontal(|ui| {
                             ui.vertical(|ui| {
                                 ui.label(
                                     RichText::new("ENDPOINT DIRECTO LAN")
-                                        .size(9.5)
+                                        .size(TYPO_LABEL)
                                         .strong()
                                         .color(TEXT_MUTED),
                                 );
                                 ui.label(
                                     RichText::new(&endpoint)
-                                        .size(12.5)
+                                        .size(TYPO_BODY)
                                         .monospace()
                                         .strong()
                                         .color(STATUS_GREEN),
                                 );
                             });
                             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                                if ui.small_button("Copiar IP").clicked() {
+                                if ui.add_sized([80.0, 28.0], egui::Button::new(RichText::new("Copiar IP").size(TYPO_LABEL))).clicked() {
                                     ui.ctx().copy_text(endpoint);
                                     self.status_message =
                                         "Dirección IP:5555 copiada al portapapeles.".to_string();
@@ -599,26 +634,26 @@ impl AgentGuiApp {
                         });
 
                         if self.tunnel_port > 0 {
-                            ui.add_space(4.0);
+                            ui.add_space(SPACE_XS);
                             let cloud_ep = format!("bore.pub:{}", self.tunnel_port);
                             ui.horizontal(|ui| {
                                 ui.vertical(|ui| {
                                     ui.label(
                                         RichText::new("RELAY GLOBAL VPN / INTERNET")
-                                            .size(9.5)
+                                            .size(TYPO_LABEL)
                                             .strong()
                                             .color(TEXT_MUTED),
                                     );
                                     ui.label(
                                         RichText::new(&cloud_ep)
-                                            .size(12.0)
+                                            .size(TYPO_BODY)
                                             .monospace()
                                             .strong()
                                             .color(BORDER_ACCENT),
                                     );
                                 });
                                 ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                                    if ui.small_button("Copiar Relay").clicked() {
+                                    if ui.add_sized([90.0, 28.0], egui::Button::new(RichText::new("Copiar Relay").size(TYPO_LABEL))).clicked() {
                                         ui.ctx().copy_text(cloud_ep);
                                         self.status_message =
                                             "Endpoint Relay Global copiado al portapapeles."
@@ -629,7 +664,7 @@ impl AgentGuiApp {
                         }
                     });
 
-                ui.add_space(8.0);
+                ui.add_space(SPACE_SM);
 
                 // CARD 2: LIVE 3-STEP CONNECTION CHECKLIST
                 let has_usb_cable =
@@ -643,17 +678,17 @@ impl AgentGuiApp {
                 Frame::new()
                     .fill(BG_CARD)
                     .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-                    .corner_radius(CornerRadius::same(8))
-                    .inner_margin(Margin::same(12))
+                    .corner_radius(CornerRadius::same(RADIUS_LARGE))
+                    .inner_margin(Margin::same(SPACE_MD as i8))
                     .show(ui, |ui| {
                         ui.set_width(ui.available_width());
                         ui.label(
                             RichText::new("LISTA DE VERIFICACIÓN USB")
-                                .size(10.5)
+                                .size(TYPO_LABEL)
                                 .strong()
                                 .color(TEXT_SECONDARY),
                         );
-                        ui.add_space(6.0);
+                        ui.add_space(SPACE_SM);
 
                         Self::render_step_row(
                             ui,
@@ -666,7 +701,7 @@ impl AgentGuiApp {
                             },
                             has_usb_cable,
                         );
-                        ui.add_space(4.0);
+                        ui.add_space(SPACE_XS);
                         Self::render_step_row(
                             ui,
                             "2",
@@ -678,7 +713,7 @@ impl AgentGuiApp {
                             },
                             has_adb_mode,
                         );
-                        ui.add_space(4.0);
+                        ui.add_space(SPACE_XS);
                         Self::render_step_row(
                             ui,
                             "3",
@@ -711,20 +746,20 @@ impl AgentGuiApp {
                     BORDER_SUBTLE
                 },
             ))
-            .corner_radius(CornerRadius::same(6))
-            .inner_margin(Margin::symmetric(8, 6))
+            .corner_radius(CornerRadius::same(RADIUS_MEDIUM))
+            .inner_margin(Margin::symmetric(SPACE_SM as i8, SPACE_SM as i8))
             .show(ui, |ui| {
                 ui.set_width(ui.available_width());
                 ui.horizontal(|ui| {
                     Frame::new()
                         .fill(bg)
                         .stroke(Stroke::new(1.0, fg))
-                        .corner_radius(CornerRadius::same(4))
-                        .inner_margin(Margin::symmetric(5, 2))
+                        .corner_radius(CornerRadius::same(RADIUS_SMALL))
+                        .inner_margin(Margin::symmetric(SPACE_SM as i8, SPACE_XS as i8))
                         .show(ui, |ui| {
                             ui.label(
                                 RichText::new(badge_txt)
-                                    .size(10.0)
+                                    .size(TYPO_LABEL)
                                     .monospace()
                                     .strong()
                                     .color(fg),
@@ -733,11 +768,11 @@ impl AgentGuiApp {
                     ui.vertical(|ui| {
                         ui.label(
                             RichText::new(title)
-                                .size(11.5)
+                                .size(TYPO_BODY)
                                 .strong()
                                 .color(if done { TEXT_PRIMARY } else { TEXT_SECONDARY }),
                         );
-                        ui.label(RichText::new(subtitle).size(10.0).color(TEXT_MUTED));
+                        ui.label(RichText::new(subtitle).size(TYPO_BODY_SMALL).color(TEXT_MUTED));
                     });
                 });
             });
@@ -748,8 +783,8 @@ impl AgentGuiApp {
         Frame::new()
             .fill(BG_CARD)
             .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-            .corner_radius(CornerRadius::same(8))
-            .inner_margin(Margin::symmetric(10, 7))
+            .corner_radius(CornerRadius::same(RADIUS_LARGE))
+            .inner_margin(Margin::symmetric(SPACE_MD as i8, SPACE_SM as i8))
             .show(ui, |ui| {
                 ui.set_width(ui.available_width());
                 ui.horizontal_wrapped(|ui| {
@@ -781,7 +816,7 @@ impl AgentGuiApp {
                 });
             });
 
-        ui.add_space(8.0);
+        ui.add_space(SPACE_SM);
 
         ScrollArea::vertical()
             .id_salt("right_workspace_scroll")
@@ -798,7 +833,7 @@ impl AgentGuiApp {
         let active = *current == target;
         let btn = egui::Button::new(
             RichText::new(label)
-                .size(11.5)
+                .size(TYPO_BUTTON)
                 .strong()
                 .color(if active { Color32::WHITE } else { TEXT_SECONDARY }),
         )
@@ -822,22 +857,22 @@ impl AgentGuiApp {
         Frame::new()
             .fill(BG_CARD)
             .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-            .corner_radius(CornerRadius::same(8))
-            .inner_margin(Margin::same(14))
+            .corner_radius(CornerRadius::same(RADIUS_LARGE))
+            .inner_margin(Margin::same(SPACE_MD as i8))
             .show(ui, |ui| {
                 ui.set_width(ui.available_width());
                 ui.label(
                     RichText::new("GUÍA RÁPIDA: CÓMO CONECTARSE CON SU TÉCNICO")
-                        .size(12.0)
+                        .size(TYPO_SECTION_TITLE)
                         .strong()
                         .color(BORDER_ACCENT),
                 );
                 ui.label(
                     RichText::new("Siga estos 3 sencillos pasos para permitir el soporte remoto en su dispositivo.")
-                        .size(10.5)
+                        .size(TYPO_BODY)
                         .color(TEXT_MUTED),
                 );
-                ui.add_space(8.0);
+                ui.add_space(SPACE_SM);
 
                 let steps = [
                     (
@@ -864,47 +899,47 @@ impl AgentGuiApp {
                     Frame::new()
                         .fill(BG_RECESSED)
                         .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-                        .corner_radius(CornerRadius::same(6))
-                        .inner_margin(Margin::same(10))
+                        .corner_radius(CornerRadius::same(RADIUS_MEDIUM))
+                        .inner_margin(Margin::same(SPACE_MD as i8))
                         .show(ui, |ui| {
                             ui.set_width(ui.available_width());
                             ui.horizontal(|ui| {
                                 Frame::new()
                                     .fill(Color32::from_rgba_unmultiplied(accent.r(), accent.g(), accent.b(), 35))
                                     .stroke(Stroke::new(1.0, accent))
-                                    .corner_radius(CornerRadius::same(4))
-                                    .inner_margin(Margin::symmetric(8, 4))
+                                    .corner_radius(CornerRadius::same(RADIUS_SMALL))
+                                    .inner_margin(Margin::symmetric(SPACE_SM as i8, SPACE_XS as i8))
                                     .show(ui, |ui| {
-                                        ui.label(RichText::new(num).size(13.0).strong().color(accent));
+                                        ui.label(RichText::new(num).size(TYPO_SUBSECTION).strong().color(accent));
                                     });
 
                                 ui.vertical(|ui| {
-                                    ui.label(RichText::new(title).size(12.0).strong().color(Color32::WHITE));
-                                    ui.add_space(2.0);
-                                    ui.label(RichText::new(desc).size(10.5).color(TEXT_SECONDARY));
+                                    ui.label(RichText::new(title).size(TYPO_BODY_LARGE).strong().color(Color32::WHITE));
+                                    ui.add_space(SPACE_XS);
+                                    ui.label(RichText::new(desc).size(TYPO_BODY).color(TEXT_SECONDARY));
                                 });
                             });
                         });
-                    ui.add_space(6.0);
+                    ui.add_space(SPACE_SM);
                 }
 
-                ui.add_space(4.0);
+                ui.add_space(SPACE_XS);
                 Frame::new()
                     .fill(Color32::from_rgb(12, 22, 38))
                     .stroke(Stroke::new(1.0, Color32::from_rgb(25, 50, 85)))
-                    .corner_radius(CornerRadius::same(6))
-                    .inner_margin(Margin::same(10))
+                    .corner_radius(CornerRadius::same(RADIUS_MEDIUM))
+                    .inner_margin(Margin::same(SPACE_MD as i8))
                     .show(ui, |ui| {
                         ui.set_width(ui.available_width());
                         ui.label(
                             RichText::new("¿Su teléfono no es detectado?")
-                                .size(11.0)
+                                .size(TYPO_BODY_LARGE)
                                 .strong()
                                 .color(BORDER_ACCENT),
                         );
                         ui.label(
                             RichText::new("Consulte la pestaña 'Guía Paso a Paso por Marca' en la barra superior para ver cómo activar 'Depuración por USB' en Samsung, Xiaomi, Motorola, Tecno o Huawei.")
-                                .size(10.0)
+                                .size(TYPO_BODY_SMALL)
                                 .color(TEXT_MUTED),
                         );
                     });
@@ -934,7 +969,7 @@ impl AgentGuiApp {
                                 ui.horizontal_wrapped(|ui| {
                                     ui.label(
                                         RichText::new(dev.display_name())
-                                            .size(15.0)
+                                            .size(TYPO_SUBSECTION)
                                             .strong()
                                             .color(Color32::WHITE),
                                     );
@@ -959,7 +994,7 @@ impl AgentGuiApp {
                                         "Cable USB Físico Local  •  ID: {}",
                                         dev.serial
                                     ))
-                                    .size(11.0)
+                                    .size(TYPO_BODY_SMALL)
                                     .monospace()
                                     .color(TEXT_SECONDARY),
                                 );
@@ -971,12 +1006,13 @@ impl AgentGuiApp {
                                         .add(
                                             egui::Button::new(
                                                 RichText::new("Activar Puente 5555")
-                                                    .size(11.5)
+                                                    .size(TYPO_BUTTON)
                                                     .strong()
                                                     .color(Color32::WHITE),
                                             )
                                             .fill(ACCENT_BLUE_DARK)
-                                            .stroke(Stroke::new(1.0, ACCENT_BLUE)),
+                                            .stroke(Stroke::new(1.0, ACCENT_BLUE))
+                                            .min_size(Vec2::new(140.0, 32.0)),
                                         )
                                         .clicked()
                                     {
@@ -986,9 +1022,9 @@ impl AgentGuiApp {
                             }
                         });
 
-                        ui.add_space(8.0);
+                        ui.add_space(SPACE_SM);
                         ui.separator();
-                        ui.add_space(6.0);
+                        ui.add_space(SPACE_XS);
 
                         let bat_txt = dev
                             .battery_percent
@@ -1019,7 +1055,7 @@ impl AgentGuiApp {
                                     dev.android_version.as_deref().unwrap_or("Consultando..."),
                                 );
                             });
-                            ui.add_space(4.0);
+                            ui.add_space(SPACE_XS);
                             ui.columns(2, |cols| {
                                 Self::spec_cell(
                                     &mut cols[0],
@@ -1031,34 +1067,34 @@ impl AgentGuiApp {
                         }
 
                         if !is_auth {
-                            ui.add_space(8.0);
+                            ui.add_space(SPACE_SM);
                             Frame::new()
                                 .fill(STATUS_AMBER_BG)
                                 .stroke(Stroke::new(1.0, STATUS_AMBER))
-                                .corner_radius(CornerRadius::same(6))
-                                .inner_margin(Margin::symmetric(10, 6))
+                                .corner_radius(CornerRadius::same(RADIUS_MEDIUM))
+                                .inner_margin(Margin::symmetric(SPACE_MD as i8, SPACE_SM as i8))
                                 .show(ui, |ui| {
                                     ui.set_width(ui.available_width());
                                     ui.label(
                                         RichText::new(
                                             "ACCIÓN REQUERIDA: Desbloquee la pantalla de su teléfono, marque 'Permitir siempre desde esta computadora' y toque Aceptar.",
                                         )
-                                        .size(11.0)
+                                        .size(TYPO_BODY_SMALL)
                                         .strong()
                                         .color(STATUS_AMBER),
                                     );
                                 });
                         }
                     });
-                ui.add_space(8.0);
+                ui.add_space(SPACE_SM);
             }
         } else if !self.detected_usb_mobiles.is_empty() {
             for mob in &self.detected_usb_mobiles {
                 Frame::new()
                     .fill(BG_CARD)
                     .stroke(Stroke::new(1.0, STATUS_AMBER))
-                    .corner_radius(CornerRadius::same(8))
-                    .inner_margin(Margin::same(14))
+                    .corner_radius(CornerRadius::same(RADIUS_LARGE))
+                    .inner_margin(Margin::same(SPACE_MD as i8))
                     .show(ui, |ui| {
                         ui.set_width(ui.available_width());
                         ui.horizontal_wrapped(|ui| {
@@ -1070,10 +1106,10 @@ impl AgentGuiApp {
                                     STATUS_AMBER,
                                     STATUS_AMBER_BG,
                                 );
-                                ui.add_space(4.0);
+                                ui.add_space(SPACE_XS);
                                 ui.label(
                                     RichText::new(mob)
-                                        .size(13.0)
+                                        .size(TYPO_BODY_LARGE)
                                         .strong()
                                         .color(Color32::WHITE),
                                 );
@@ -1081,15 +1117,16 @@ impl AgentGuiApp {
                                     RichText::new(
                                         "El cable USB está conectado, pero falta activar 'Depuración por USB' en los Ajustes del teléfono.",
                                     )
-                                    .size(11.5)
+                                    .size(TYPO_BODY)
                                     .color(TEXT_SECONDARY),
                                 );
                             });
                         });
-                        ui.add_space(6.0);
+                        ui.add_space(SPACE_SM);
                         if ui
                             .button(
                                 RichText::new("Ver Instrucciones Paso a Paso para mi Marca")
+                                    .size(TYPO_BUTTON)
                                     .strong()
                                     .color(BORDER_ACCENT),
                             )
@@ -1098,45 +1135,45 @@ impl AgentGuiApp {
                             self.active_tab = ClientTab::BrandGuide;
                         }
                     });
-                ui.add_space(8.0);
+                ui.add_space(SPACE_SM);
             }
         } else {
             Frame::new()
                 .fill(BG_CARD)
                 .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-                .corner_radius(CornerRadius::same(8))
-                .inner_margin(Margin::symmetric(20, 28))
+                .corner_radius(CornerRadius::same(RADIUS_LARGE))
+                .inner_margin(Margin::symmetric(SPACE_LG as i8, SPACE_XL as i8))
                 .show(ui, |ui| {
                     ui.set_width(ui.available_width());
                     ui.vertical_centered(|ui| {
                         Self::draw_phone_vector(ui, TEXT_MUTED);
-                        ui.add_space(8.0);
+                        ui.add_space(SPACE_SM);
                         ui.label(
                             RichText::new("Ningún Teléfono Detectado en Puertos USB Locales")
-                                .size(14.5)
+                                .size(TYPO_SECTION_TITLE)
                                 .strong()
                                 .color(TEXT_PRIMARY),
                         );
-                        ui.add_space(4.0);
+                        ui.add_space(SPACE_XS);
                         ui.label(
                             RichText::new(
                                 "Conecte su dispositivo Android directamente a la computadora usando un cable USB de transferencia de datos.",
                             )
-                            .size(11.5)
+                            .size(TYPO_BODY)
                             .color(TEXT_SECONDARY),
                         );
-                        ui.add_space(12.0);
+                        ui.add_space(SPACE_MD);
                         if ui
                             .add(
                                 egui::Button::new(
                                     RichText::new("Abrir Guía de Configuración USB por Marca")
-                                        .size(12.0)
+                                        .size(TYPO_BUTTON)
                                         .strong()
                                         .color(Color32::WHITE),
                                 )
                                 .fill(ACCENT_BLUE_DARK)
                                 .stroke(Stroke::new(1.0, ACCENT_BLUE))
-                                .min_size(Vec2::new(240.0, 32.0)),
+                                .min_size(Vec2::new(260.0, 36.0)),
                             )
                             .clicked()
                         {
@@ -1155,14 +1192,14 @@ impl AgentGuiApp {
         Frame::new()
             .fill(BG_RECESSED)
             .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-            .corner_radius(CornerRadius::same(5))
-            .inner_margin(Margin::symmetric(8, 5))
+            .corner_radius(CornerRadius::same(RADIUS_SMALL))
+            .inner_margin(Margin::symmetric(SPACE_SM as i8, SPACE_XS as i8))
             .show(ui, |ui| {
                 ui.set_width(ui.available_width());
-                ui.label(RichText::new(label).size(9.0).strong().color(TEXT_MUTED));
+                ui.label(RichText::new(label).size(TYPO_LABEL).strong().color(TEXT_MUTED));
                 ui.label(
                     RichText::new(value)
-                        .size(11.5)
+                        .size(TYPO_BODY)
                         .monospace()
                         .strong()
                         .color(TEXT_PRIMARY),
@@ -1174,17 +1211,17 @@ impl AgentGuiApp {
         Frame::new()
             .fill(BG_CARD)
             .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-            .corner_radius(CornerRadius::same(8))
-            .inner_margin(Margin::same(14))
+            .corner_radius(CornerRadius::same(RADIUS_LARGE))
+            .inner_margin(Margin::same(SPACE_MD as i8))
             .show(ui, |ui| {
                 ui.set_width(ui.available_width());
                 ui.label(
                     RichText::new("SELECCIONE LA MARCA DE SU TELÉFONO")
-                        .size(10.5)
+                        .size(TYPO_LABEL)
                         .strong()
                         .color(TEXT_SECONDARY),
                 );
-                ui.add_space(6.0);
+                ui.add_space(SPACE_SM);
 
                 ui.horizontal_wrapped(|ui| {
                     for (brand, name) in [
@@ -1197,7 +1234,7 @@ impl AgentGuiApp {
                         let active = self.selected_brand == brand;
                         let btn = egui::Button::new(
                             RichText::new(name)
-                                .size(11.0)
+                                .size(TYPO_BUTTON)
                                 .strong()
                                 .color(if active { Color32::WHITE } else { TEXT_SECONDARY }),
                         )
@@ -1209,16 +1246,17 @@ impl AgentGuiApp {
                         .stroke(Stroke::new(
                             1.0,
                             if active { ACCENT_BLUE } else { BORDER_SUBTLE },
-                        ));
+                        ))
+                        .min_size(Vec2::new(120.0, 32.0));
                         if ui.add(btn).clicked() {
                             self.selected_brand = brand;
                         }
                     }
                 });
 
-                ui.add_space(10.0);
+                ui.add_space(SPACE_MD);
                 ui.separator();
-                ui.add_space(8.0);
+                ui.add_space(SPACE_SM);
 
                 let (title, steps, note) = match self.selected_brand {
                     PhoneBrand::Samsung => (
@@ -1280,34 +1318,34 @@ impl AgentGuiApp {
 
                 ui.label(
                     RichText::new(title)
-                        .size(13.5)
+                        .size(TYPO_SUBSECTION)
                         .strong()
                         .color(BORDER_ACCENT),
                 );
-                ui.add_space(6.0);
+                ui.add_space(SPACE_SM);
 
                 for step in steps {
                     Frame::new()
                         .fill(BG_RECESSED)
                         .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-                        .corner_radius(CornerRadius::same(5))
-                        .inner_margin(Margin::symmetric(10, 6))
+                        .corner_radius(CornerRadius::same(RADIUS_SMALL))
+                        .inner_margin(Margin::symmetric(SPACE_MD as i8, SPACE_SM as i8))
                         .show(ui, |ui| {
                             ui.set_width(ui.available_width());
-                            ui.label(RichText::new(step).size(11.5).color(TEXT_PRIMARY));
+                            ui.label(RichText::new(step).size(TYPO_BODY).color(TEXT_PRIMARY));
                         });
-                    ui.add_space(4.0);
+                    ui.add_space(SPACE_XS);
                 }
 
-                ui.add_space(4.0);
+                ui.add_space(SPACE_XS);
                 Frame::new()
                     .fill(Color32::from_rgb(12, 38, 62))
                     .stroke(Stroke::new(1.0, ACCENT_BLUE))
-                    .corner_radius(CornerRadius::same(6))
-                    .inner_margin(Margin::symmetric(10, 7))
+                    .corner_radius(CornerRadius::same(RADIUS_MEDIUM))
+                    .inner_margin(Margin::symmetric(SPACE_MD as i8, SPACE_SM as i8))
                     .show(ui, |ui| {
                         ui.set_width(ui.available_width());
-                        ui.label(RichText::new(note).size(11.0).color(TEXT_PRIMARY));
+                        ui.label(RichText::new(note).size(TYPO_BODY_SMALL).color(TEXT_PRIMARY));
                     });
             });
     }
@@ -1316,19 +1354,19 @@ impl AgentGuiApp {
         Frame::new()
             .fill(BG_CARD)
             .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-            .corner_radius(CornerRadius::same(8))
-            .inner_margin(Margin::same(14))
+            .corner_radius(CornerRadius::same(RADIUS_LARGE))
+            .inner_margin(Margin::same(SPACE_MD as i8))
             .show(ui, |ui| {
                 ui.set_width(ui.available_width());
                 ui.horizontal(|ui| {
                     ui.label(
                         RichText::new("BITÁCORA DE EVENTOS DE LA ESTACIÓN")
-                            .size(10.5)
+                            .size(TYPO_LABEL)
                             .strong()
                             .color(TEXT_SECONDARY),
                     );
                     ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                        if ui.small_button("Copiar Bitácora").clicked() {
+                        if ui.add_sized([110.0, 28.0], egui::Button::new(RichText::new("Copiar Bitácora").size(TYPO_LABEL))).clicked() {
                             let full = self
                                 .activity_log
                                 .iter()
@@ -1340,14 +1378,14 @@ impl AgentGuiApp {
                         }
                     });
                 });
-                ui.add_space(6.0);
+                ui.add_space(SPACE_SM);
 
                 for (tag, msg) in &self.activity_log {
                     Frame::new()
                         .fill(BG_RECESSED)
                         .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-                        .corner_radius(CornerRadius::same(4))
-                        .inner_margin(Margin::symmetric(10, 5))
+                        .corner_radius(CornerRadius::same(RADIUS_SMALL))
+                        .inner_margin(Margin::symmetric(SPACE_MD as i8, SPACE_XS as i8))
                         .show(ui, |ui| {
                             ui.set_width(ui.available_width());
                             ui.horizontal_wrapped(|ui| {
@@ -1358,20 +1396,20 @@ impl AgentGuiApp {
                                 };
                                 ui.label(
                                     RichText::new(format!("[{tag}]"))
-                                        .size(10.5)
+                                        .size(TYPO_LABEL)
                                         .monospace()
                                         .strong()
                                         .color(col),
                                 );
                                 ui.label(
                                     RichText::new(msg)
-                                        .size(11.0)
+                                        .size(TYPO_BODY)
                                         .monospace()
                                         .color(TEXT_PRIMARY),
                                 );
                             });
                         });
-                    ui.add_space(4.0);
+                    ui.add_space(SPACE_XS);
                 }
             });
     }
@@ -1394,7 +1432,7 @@ impl eframe::App for AgentGuiApp {
             .frame(
                 Frame::new()
                     .fill(BG_HEADER)
-                    .inner_margin(Margin::symmetric(14, 10))
+                    .inner_margin(Margin::symmetric(SPACE_MD as i8, SPACE_SM as i8))
                     .stroke(Stroke::new(1.0, BORDER_SUBTLE)),
             )
             .show(ui, |ui| {
@@ -1404,7 +1442,7 @@ impl eframe::App for AgentGuiApp {
                         ui.horizontal(|ui| {
                             ui.label(
                                 RichText::new("ADBHUB-LINK")
-                                    .size(15.5)
+                                    .size(TYPO_SUBSECTION)
                                     .strong()
                                     .color(Color32::WHITE),
                             );
@@ -1420,14 +1458,14 @@ impl eframe::App for AgentGuiApp {
                                 "Equipo: {}  •  IP LAN: {}",
                                 self.host_name, self.local_ip
                             ))
-                            .size(10.5)
+                            .size(TYPO_BODY_SMALL)
                             .color(TEXT_SECONDARY),
                         );
                     });
 
                     ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                         if ui
-                            .button(RichText::new("Actualizar USB").size(11.5).strong())
+                            .add_sized([120.0, 32.0], egui::Button::new(RichText::new("Actualizar USB").size(TYPO_BUTTON).strong()))
                             .clicked()
                         {
                             self.trigger_hardware_scan(false);
@@ -1435,7 +1473,7 @@ impl eframe::App for AgentGuiApp {
                         }
 
                         if ui
-                            .button(RichText::new("Aislar Red").size(11.5))
+                            .add_sized([90.0, 32.0], egui::Button::new(RichText::new("Aislar Red").size(TYPO_BUTTON)))
                             .on_hover_text("Desconecta endpoints externos y muestra solo USB físico")
                             .clicked()
                         {
@@ -1465,7 +1503,7 @@ impl eframe::App for AgentGuiApp {
 
                         ui.label(
                             RichText::new(status_txt)
-                                .size(11.0)
+                                .size(TYPO_LABEL)
                                 .strong()
                                 .color(status_col),
                         );
@@ -1480,20 +1518,20 @@ impl eframe::App for AgentGuiApp {
             .frame(
                 Frame::new()
                     .fill(BG_HEADER)
-                    .inner_margin(Margin::symmetric(14, 6))
+                    .inner_margin(Margin::symmetric(SPACE_MD as i8, SPACE_XS as i8))
                     .stroke(Stroke::new(1.0, BORDER_SUBTLE)),
             )
             .show(ui, |ui| {
                 ui.horizontal(|ui| {
                     ui.label(
                         RichText::new("ADBHUB-LINK v2.0 • Motor USB/ADB Silencioso")
-                            .size(10.5)
+                            .size(TYPO_LABEL)
                             .color(TEXT_MUTED),
                     );
                     ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                         ui.label(
                             RichText::new(&self.status_message)
-                                .size(10.5)
+                                .size(TYPO_LABEL)
                                 .strong()
                                 .color(BORDER_ACCENT),
                         );
@@ -1504,12 +1542,12 @@ impl eframe::App for AgentGuiApp {
         // 3. LEFT RESIZABLE & SCROLLABLE CREDENTIALS PANEL
         Panel::left("client_left_panel")
             .resizable(true)
-            .default_size(275.0)
-            .size_range(230.0..=360.0)
+            .default_size(285.0)
+            .size_range(240.0..=380.0)
             .frame(
                 Frame::new()
                     .fill(BG_CANVAS)
-                    .inner_margin(Margin::symmetric(12, 10))
+                    .inner_margin(Margin::symmetric(SPACE_MD as i8, SPACE_SM as i8))
                     .stroke(Stroke::new(1.0, BORDER_SUBTLE)),
             )
             .show(ui, |ui| {
@@ -1521,7 +1559,7 @@ impl eframe::App for AgentGuiApp {
             .frame(
                 Frame::new()
                     .fill(BG_CANVAS)
-                    .inner_margin(Margin::symmetric(12, 10)),
+                    .inner_margin(Margin::symmetric(SPACE_MD as i8, SPACE_SM as i8)),
             )
             .show(ui, |ui| {
                 self.render_right_workspace(ui);

@@ -7,7 +7,7 @@
       "platform": "Windows 10/11 x64",
       "version": "0.1.0",
       "online": true,
-      "last_seen": "2026-11-08T17:09:05.799519Z",
+      "last_seen": "2026-11-08T17:10:29.456384700Z",
       "agent_public_key": "ed25519:local-host-agent-key"
     }
   ],
@@ -36,6 +36,28 @@
       "updated_at": "2026-11-07T21:37:54.468160300Z"
     },
     {
+      "id": "43a01f6f-23d2-45d4-88f6-2890fe112581",
+      "agent_id": "4ae81017-eda8-4c3c-99ca-fa6ae345f66e",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2
+        ]
+      },
+      "vendor_id": 3725,
+      "product_id": 8220,
+      "manufacturer": "MediaTek",
+      "product_name": "Android ADB Interface",
+      "serial_hash": "ccd794e018e89c15563656eb545706ff383764b7a01bcf77a5837bf0f1c5716b",
+      "interface_descriptors": [],
+      "device_state": "DISCONNECTED",
+      "usb_mode": "AndroidAdb",
+      "odin_compatibility": "Unknown",
+      "online": false,
+      "shared": true,
+      "updated_at": "2026-11-08T17:10:29.456384700Z"
+    },
+    {
       "id": "642a0b4b-c677-4cde-ab41-a2438bf4cbdc",
       "agent_id": "4ae81017-eda8-4c3c-99ca-fa6ae345f66e",
       "busid": {
@@ -59,28 +81,6 @@
       "updated_at": "2026-11-08T17:02:12.354981400Z"
     },
     {
-      "id": "43a01f6f-23d2-45d4-88f6-2890fe112581",
-      "agent_id": "4ae81017-eda8-4c3c-99ca-fa6ae345f66e",
-      "busid": {
-        "bus": 1,
-        "port_chain": [
-          2
-        ]
-      },
-      "vendor_id": 3725,
-      "product_id": 8220,
-      "manufacturer": "MediaTek",
-      "product_name": "Android ADB Interface",
-      "serial_hash": "ccd794e018e89c15563656eb545706ff383764b7a01bcf77a5837bf0f1c5716b",
-      "interface_descriptors": [],
-      "device_state": "DISCONNECTED",
-      "usb_mode": "AndroidAdb",
-      "odin_compatibility": "Unknown",
-      "online": false,
-      "shared": true,
-      "updated_at": "2026-11-08T17:09:05.799519Z"
-    },
-    {
       "id": "b7e68425-bec4-4d2d-ab86-18b72e11ee61",
       "agent_id": "4ae81017-eda8-4c3c-99ca-fa6ae345f66e",
       "busid": {
@@ -101,7 +101,7 @@
       "odin_compatibility": "Unknown",
       "online": false,
       "shared": true,
-      "updated_at": "2026-11-08T17:09:05.799519Z"
+      "updated_at": "2026-11-08T17:10:29.456384700Z"
     }
   ]
 }

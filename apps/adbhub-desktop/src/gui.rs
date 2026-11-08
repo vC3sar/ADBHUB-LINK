@@ -19,7 +19,7 @@ use eframe::egui::{
 use tokio::runtime::Runtime;
 
 // ============================================================================
-// ENTERPRISE COLOR PALETTE
+// GLOBAL DESIGN SYSTEM TOKENS (DESIGN_SYSTEM.md)
 // ============================================================================
 const BG_CANVAS: Color32 = Color32::from_rgb(9, 13, 22); // #090D16
 const BG_SIDEBAR: Color32 = Color32::from_rgb(12, 17, 29); // #0C111D
@@ -28,9 +28,9 @@ const BG_RECESSED: Color32 = Color32::from_rgb(7, 10, 17); // #070A11
 const BORDER_SUBTLE: Color32 = Color32::from_rgb(30, 41, 59); // #1E293B
 const BORDER_ACCENT: Color32 = Color32::from_rgb(56, 189, 248); // #38BDF8
 
-const TEXT_PRIMARY: Color32 = Color32::from_rgb(241, 245, 249); // #F1F5F9
-const TEXT_SECONDARY: Color32 = Color32::from_rgb(148, 163, 184); // #94A3B8
-const TEXT_MUTED: Color32 = Color32::from_rgb(100, 116, 139); // #64748B
+const TEXT_PRIMARY: Color32 = Color32::from_rgb(241, 245, 249); // #F1F5F9 (WCAG AAA)
+const TEXT_SECONDARY: Color32 = Color32::from_rgb(148, 163, 184); // #94A3B8 (WCAG AA)
+const TEXT_MUTED: Color32 = Color32::from_rgb(100, 116, 139); // #64748B (WCAG AA)
 
 const ACCENT_BLUE: Color32 = Color32::from_rgb(14, 165, 233); // #0EA5E9
 const ACCENT_BLUE_DARK: Color32 = Color32::from_rgb(3, 105, 161); // #0369A1
@@ -39,6 +39,41 @@ const STATUS_GREEN_BG: Color32 = Color32::from_rgb(6, 58, 43);
 const STATUS_AMBER: Color32 = Color32::from_rgb(245, 158, 11); // #F59E0B
 const STATUS_RED: Color32 = Color32::from_rgb(239, 68, 68); // #EF4444
 const STATUS_RED_BG: Color32 = Color32::from_rgb(69, 15, 20);
+
+// Escala Tipográfica Responsive Estandarizada
+pub const TYPO_DISPLAY: f32 = 32.0;
+pub const TYPO_PAGE_TITLE: f32 = 28.0;
+pub const TYPO_SECTION_TITLE: f32 = 22.0;
+pub const TYPO_SUBSECTION: f32 = 18.0;
+pub const TYPO_BODY_LARGE: f32 = 16.0;
+pub const TYPO_BODY: f32 = 15.0;
+pub const TYPO_BODY_SMALL: f32 = 14.0;
+pub const TYPO_BUTTON: f32 = 14.5;
+pub const TYPO_LABEL: f32 = 13.0;
+pub const TYPO_INPUT: f32 = 15.5;
+pub const TYPO_MONO_CODE: f32 = 18.0;
+
+// Grid de Espaciado (múltiplos de 4)
+pub const SPACE_1: f32 = 4.0;
+pub const SPACE_2: f32 = 8.0;
+pub const SPACE_3: f32 = 12.0;
+pub const SPACE_4: f32 = 16.0;
+pub const SPACE_5: f32 = 20.0;
+pub const SPACE_6: f32 = 24.0;
+pub const SPACE_8: f32 = 32.0;
+
+pub const SPACE_XS: f32 = 4.0;
+pub const SPACE_SM: f32 = 8.0;
+pub const SPACE_MD: f32 = 16.0;
+pub const SPACE_LG: f32 = 24.0;
+pub const SPACE_XL: f32 = 32.0;
+
+// Radii de Superficie y Componentes
+pub const RADIUS_NONE: u8 = 0;
+pub const RADIUS_SMALL: u8 = 4;
+pub const RADIUS_MEDIUM: u8 = 6;
+pub const RADIUS_LARGE: u8 = 8;
+pub const RADIUS_FULL: u8 = 99;
 
 pub const APK_MEDIAFIRE_URL: &str =
     "https://www.mediafire.com/file/5vh10fh39e0vcwi/adbhub-client.apk/file";
@@ -592,10 +627,10 @@ impl DesktopGuiApp {
         Frame::new()
             .fill(bg)
             .stroke(Stroke::new(1.0, fg))
-            .corner_radius(CornerRadius::same(4))
-            .inner_margin(Margin::symmetric(7, 2))
+            .corner_radius(CornerRadius::same(RADIUS_SMALL))
+            .inner_margin(Margin::symmetric(SPACE_2 as i8, SPACE_1 as i8))
             .show(ui, |ui| {
-                ui.label(RichText::new(text).size(10.0).strong().color(fg));
+                ui.label(RichText::new(text).size(TYPO_LABEL).strong().color(fg));
             });
     }
 
@@ -603,19 +638,21 @@ impl DesktopGuiApp {
         Frame::new()
             .fill(BG_RECESSED)
             .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-            .corner_radius(CornerRadius::same(6))
-            .inner_margin(Margin::symmetric(8, 6))
+            .corner_radius(CornerRadius::same(RADIUS_SMALL))
+            .inner_margin(Margin::symmetric(SPACE_3 as i8, SPACE_2 as i8))
             .show(ui, |ui| {
                 ui.set_width(ui.available_width());
-                ui.label(RichText::new(title).size(9.0).strong().color(TEXT_MUTED));
+                ui.label(RichText::new(title).size(TYPO_LABEL).strong().color(TEXT_MUTED));
+                ui.add_space(2.0);
                 ui.label(
                     RichText::new(value)
-                        .size(12.0)
+                        .size(TYPO_BODY_LARGE)
                         .monospace()
                         .strong()
                         .color(accent),
                 );
-                ui.label(RichText::new(subtitle).size(9.5).color(TEXT_SECONDARY));
+                ui.add_space(2.0);
+                ui.label(RichText::new(subtitle).size(TYPO_BODY_SMALL).color(TEXT_SECONDARY));
             });
     }
 
@@ -626,33 +663,34 @@ impl DesktopGuiApp {
             .show(ui, |ui| {
                 ui.horizontal(|ui| {
                     Self::draw_brand_mark(ui);
+                    ui.add_space(SPACE_1);
                     ui.vertical(|ui| {
                         ui.label(
                             RichText::new("ADBHUB-LINK")
-                                .size(14.5)
+                                .size(TYPO_SUBSECTION)
                                 .strong()
                                 .color(Color32::WHITE),
                         );
                         ui.label(
                             RichText::new("ESTACIÓN DEL TÉCNICO")
-                                .size(9.5)
+                                .size(TYPO_LABEL)
                                 .strong()
                                 .color(BORDER_ACCENT),
                         );
                     });
                 });
 
-                ui.add_space(10.0);
+                ui.add_space(SPACE_3);
                 ui.separator();
-                ui.add_space(6.0);
+                ui.add_space(SPACE_2);
 
                 ui.label(
                     RichText::new("MÓDULOS DE TRABAJO")
-                        .size(9.5)
+                        .size(TYPO_LABEL)
                         .strong()
                         .color(TEXT_MUTED),
                 );
-                ui.add_space(4.0);
+                ui.add_space(SPACE_1);
 
                 Self::sidebar_nav_btn(
                     ui,
@@ -661,7 +699,7 @@ impl DesktopGuiApp {
                     "01  Panel de Control",
                     "Ficha técnica y reinicio",
                 );
-                ui.add_space(4.0);
+                ui.add_space(SPACE_1);
                 Self::sidebar_nav_btn(
                     ui,
                     &mut self.active_nav,
@@ -669,7 +707,7 @@ impl DesktopGuiApp {
                     "02  Consola ADB",
                     "Shell y diagnósticos 1-clic",
                 );
-                ui.add_space(4.0);
+                ui.add_space(SPACE_1);
                 Self::sidebar_nav_btn(
                     ui,
                     &mut self.active_nav,
@@ -677,7 +715,7 @@ impl DesktopGuiApp {
                     &format!("03  Equipos Activos ({})", self.server_devices.len()),
                     "Puertos en este servidor",
                 );
-                ui.add_space(4.0);
+                ui.add_space(SPACE_1);
                 Self::sidebar_nav_btn(
                     ui,
                     &mut self.active_nav,
@@ -685,7 +723,7 @@ impl DesktopGuiApp {
                     "04  Guía & Laboratorio",
                     "UnlockTool / Chimera / SamFirm",
                 );
-                ui.add_space(4.0);
+                ui.add_space(SPACE_1);
                 Self::sidebar_nav_btn(
                     ui,
                     &mut self.active_nav,
@@ -694,29 +732,30 @@ impl DesktopGuiApp {
                     "MediaFire • Enlace al Cliente",
                 );
 
-                ui.add_space(8.0);
+                ui.add_space(SPACE_2);
                 Frame::new()
                     .fill(BG_CARD)
                     .stroke(Stroke::new(1.0, Color32::from_rgb(14, 165, 233)))
-                    .corner_radius(CornerRadius::same(6))
-                    .inner_margin(Margin::same(8))
+                    .corner_radius(CornerRadius::same(RADIUS_SMALL))
+                    .inner_margin(Margin::same(SPACE_2 as i8))
                     .show(ui, |ui| {
                         ui.set_width(ui.available_width());
                         ui.horizontal(|ui| {
                             if let Some(tex) = &self.qr_texture {
-                                ui.image((tex.id(), Vec2::new(38.0, 38.0)));
+                                ui.image((tex.id(), Vec2::new(42.0, 42.0)));
                             }
+                            ui.add_space(SPACE_1);
                             ui.vertical(|ui| {
                                 ui.label(
                                     RichText::new("QR APK CLIENTE")
-                                        .size(9.5)
+                                        .size(TYPO_LABEL)
                                         .strong()
                                         .color(Color32::WHITE),
                                 );
                                 if ui
                                     .button(
                                         RichText::new("Ver QR / Compartir")
-                                            .size(9.0)
+                                            .size(TYPO_LABEL)
                                             .color(BORDER_ACCENT),
                                     )
                                     .clicked()
@@ -727,12 +766,12 @@ impl DesktopGuiApp {
                         });
                     });
 
-                ui.add_space(12.0);
+                ui.add_space(SPACE_3);
                 Frame::new()
                     .fill(BG_RECESSED)
                     .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-                    .corner_radius(CornerRadius::same(6))
-                    .inner_margin(Margin::same(8))
+                    .corner_radius(CornerRadius::same(RADIUS_SMALL))
+                    .inner_margin(Margin::same(SPACE_2 as i8))
                     .show(ui, |ui| {
                         ui.set_width(ui.available_width());
                         ui.horizontal(|ui| {
@@ -744,11 +783,11 @@ impl DesktopGuiApp {
                                 _ => (TEXT_SECONDARY, "SERVIDOR LISTO"),
                             };
                             Self::draw_status_dot(ui, col);
-                            ui.label(RichText::new(txt).size(10.0).strong().color(col));
+                            ui.label(RichText::new(txt).size(TYPO_LABEL).strong().color(col));
                         });
                         ui.label(
                             RichText::new("127.0.0.1:5037")
-                                .size(9.5)
+                                .size(TYPO_BODY_SMALL)
                                 .monospace()
                                 .color(TEXT_MUTED),
                         );
@@ -774,18 +813,19 @@ impl DesktopGuiApp {
         let resp = Frame::new()
             .fill(fill)
             .stroke(Stroke::new(1.0, border))
-            .corner_radius(CornerRadius::same(6))
-            .inner_margin(Margin::symmetric(8, 7))
+            .corner_radius(CornerRadius::same(RADIUS_SMALL))
+            .inner_margin(Margin::symmetric(SPACE_3 as i8, SPACE_2 as i8))
             .show(ui, |ui| {
                 ui.set_width(ui.available_width());
                 ui.vertical(|ui| {
                     ui.label(
                         RichText::new(title)
-                            .size(11.5)
+                            .size(TYPO_BODY)
                             .strong()
                             .color(if active { Color32::WHITE } else { TEXT_PRIMARY }),
                     );
-                    ui.label(RichText::new(subtitle).size(9.5).color(TEXT_MUTED));
+                    ui.add_space(1.0);
+                    ui.label(RichText::new(subtitle).size(TYPO_LABEL).color(TEXT_MUTED));
                 });
             })
             .response
@@ -827,7 +867,7 @@ impl DesktopGuiApp {
                 ui.horizontal(|ui| {
                     ui.label(
                         RichText::new("VINCULACIÓN REMOTA CON EL CLIENTE")
-                            .size(10.5)
+                            .size(TYPO_LABEL)
                             .strong()
                             .color(TEXT_MUTED),
                     );
@@ -858,7 +898,7 @@ impl DesktopGuiApp {
                     });
                 });
 
-                ui.add_space(8.0);
+                ui.add_space(SPACE_2);
 
                 // Caja de Entrada Hero (Input Box Prominente con Recessed Glow)
                 let input_frame_bg = BG_RECESSED;
@@ -873,8 +913,8 @@ impl DesktopGuiApp {
                 Frame::new()
                     .fill(input_frame_bg)
                     .stroke(Stroke::new(1.5, input_stroke_color))
-                    .corner_radius(CornerRadius::same(8))
-                    .inner_margin(Margin::symmetric(10, 8))
+                    .corner_radius(CornerRadius::same(RADIUS_MEDIUM))
+                    .inner_margin(Margin::symmetric(SPACE_3 as i8, SPACE_2 as i8))
                     .show(ui, |ui| {
                         ui.set_width(ui.available_width());
 
@@ -882,42 +922,42 @@ impl DesktopGuiApp {
                             // Icono visual de enlace o llave
                             ui.label(
                                 RichText::new("ID / IP")
-                                    .size(11.0)
+                                    .size(TYPO_LABEL)
                                     .strong()
                                     .color(BORDER_ACCENT),
                             );
 
-                            ui.add_space(6.0);
+                            ui.add_space(SPACE_2);
 
                             // Campo de texto grande y de alto contraste
                             let avail = ui.available_width();
                             let reserve_w = if is_connecting {
-                                170.0
+                                180.0
                             } else if is_connected {
-                                260.0
+                                280.0
                             } else {
-                                230.0
+                                250.0
                             };
-                            let input_w = (avail - reserve_w).max(180.0);
+                            let input_w = (avail - reserve_w).max(200.0);
 
                             let text_edit = egui::TextEdit::singleline(&mut self.input_code)
                                 .hint_text("Pegue aquí el Código (ej. 8924-BE29-19BC-30DB) o IP:5555")
-                                .font(egui::TextStyle::Monospace)
+                                .font(egui::FontId::new(TYPO_INPUT, FontFamily::Monospace))
                                 .text_color(TEXT_PRIMARY);
 
-                            let edit_response = ui.add_sized([input_w, 32.0], text_edit);
+                            let edit_response = ui.add_sized([input_w, 36.0], text_edit);
 
-                            // Botón de pegar desde el portapapeles si está vacío o para comodidad
+                            // Botón de pegar desde el portapapeles
                             let paste_btn = ui.add(
                                 egui::Button::new(
                                     RichText::new("Pegar")
-                                        .size(11.0)
+                                        .size(TYPO_BUTTON)
                                         .strong()
                                         .color(BORDER_ACCENT),
                                 )
                                 .fill(Color32::from_rgb(20, 32, 50))
                                 .stroke(Stroke::new(1.0, Color32::from_rgb(40, 60, 90)))
-                                .min_size(Vec2::new(56.0, 32.0)),
+                                .min_size(Vec2::new(64.0, 36.0)),
                             );
 
                             if paste_btn.clicked() {
@@ -943,12 +983,12 @@ impl DesktopGuiApp {
                                 let clear_btn = ui.add(
                                     egui::Button::new(
                                         RichText::new("x")
-                                            .size(11.5)
+                                            .size(TYPO_BODY_LARGE)
                                             .strong()
                                             .color(TEXT_MUTED),
                                     )
                                     .fill(Color32::TRANSPARENT)
-                                    .min_size(Vec2::new(24.0, 32.0)),
+                                    .min_size(Vec2::new(28.0, 36.0)),
                                 );
                                 if clear_btn.clicked() {
                                     self.input_code.clear();
@@ -961,30 +1001,30 @@ impl DesktopGuiApp {
                                         .add(
                                             egui::Button::new(
                                                 RichText::new("CANCELAR")
-                                                    .size(11.5)
+                                                    .size(TYPO_BUTTON)
                                                     .strong()
                                                     .color(Color32::WHITE),
                                             )
                                             .fill(STATUS_RED_BG)
                                             .stroke(Stroke::new(1.0, STATUS_RED))
-                                            .min_size(Vec2::new(95.0, 32.0)),
+                                            .min_size(Vec2::new(105.0, 36.0)),
                                         )
                                         .clicked()
                                     {
                                         *do_cancel = true;
                                     }
-                                    ui.add(egui::Spinner::new().size(18.0));
+                                    ui.add(egui::Spinner::new().size(20.0));
                                 } else {
                                     let connect_btn = ui.add(
                                         egui::Button::new(
                                             RichText::new("CONECTAR AHORA")
-                                                .size(12.0)
+                                                .size(TYPO_BUTTON)
                                                 .strong()
                                                 .color(Color32::WHITE),
                                         )
                                         .fill(ACCENT_BLUE_DARK)
                                         .stroke(Stroke::new(1.0, ACCENT_BLUE))
-                                        .min_size(Vec2::new(135.0, 32.0)),
+                                        .min_size(Vec2::new(150.0, 36.0)),
                                     );
 
                                     let enter = edit_response.lost_focus()
@@ -999,13 +1039,13 @@ impl DesktopGuiApp {
                                             .add(
                                                 egui::Button::new(
                                                     RichText::new("DESCONECTAR")
-                                                        .size(11.0)
+                                                        .size(TYPO_BUTTON)
                                                         .strong()
                                                         .color(Color32::WHITE),
                                                 )
                                                 .fill(STATUS_RED_BG)
                                                 .stroke(Stroke::new(1.0, STATUS_RED))
-                                                .min_size(Vec2::new(105.0, 32.0)),
+                                                .min_size(Vec2::new(120.0, 36.0)),
                                             )
                                             .clicked()
                                         {
@@ -1017,13 +1057,13 @@ impl DesktopGuiApp {
                         });
                     });
 
-                ui.add_space(6.0);
+                ui.add_space(SPACE_2);
 
                 // Fila Inferior: Chips de Historial / Recientes y Guía Rápida
                 ui.horizontal_wrapped(|ui| {
                     ui.label(
                         RichText::new("Historial Reciente:")
-                            .size(10.0)
+                            .size(TYPO_LABEL)
                             .strong()
                             .color(TEXT_MUTED),
                     );
@@ -1032,7 +1072,7 @@ impl DesktopGuiApp {
                     if eps.is_empty() {
                         ui.label(
                             RichText::new("Sin conexiones previas")
-                                .size(10.0)
+                                .size(TYPO_LABEL)
                                 .italics()
                                 .color(TEXT_MUTED),
                         );
@@ -1048,7 +1088,7 @@ impl DesktopGuiApp {
                             let btn = egui::Button::new(
                                 RichText::new(&ep)
                                     .monospace()
-                                    .size(10.5)
+                                    .size(TYPO_LABEL)
                                     .color(chip_fg),
                             )
                             .fill(chip_bg)
@@ -1064,7 +1104,7 @@ impl DesktopGuiApp {
                     ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                         ui.label(
                             RichText::new("Acepta códigos AnyDesk (16 car.) o IP:5555 • Presione Enter para conectar")
-                                .size(9.5)
+                                .size(TYPO_BODY_SMALL)
                                 .color(TEXT_MUTED),
                         );
                     });
@@ -1121,7 +1161,7 @@ impl DesktopGuiApp {
                             ui.horizontal_wrapped(|ui| {
                                 ui.label(
                                     RichText::new(device.display_name())
-                                        .size(15.5)
+                                        .size(TYPO_SECTION_TITLE)
                                         .strong()
                                         .color(Color32::WHITE),
                                 );
@@ -1137,7 +1177,7 @@ impl DesktopGuiApp {
                                     "ID: {}  •  Listo para UnlockTool, Chimera, SamFirm y Terminal",
                                     device.serial
                                 ))
-                                .size(11.0)
+                                .size(TYPO_BODY)
                                 .color(TEXT_SECONDARY),
                             );
                         });
@@ -1145,7 +1185,7 @@ impl DesktopGuiApp {
                         ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                             let cmd_str = format!("adb -s {current_serial} shell");
                             if ui
-                                .small_button(RichText::new("Copiar Shell").size(11.0))
+                                .button(RichText::new("Copiar Shell").size(TYPO_BUTTON).color(Color32::WHITE))
                                 .clicked()
                             {
                                 ui.ctx().copy_text(cmd_str);
@@ -1155,7 +1195,7 @@ impl DesktopGuiApp {
                                 ));
                             }
                             if ui
-                                .small_button(RichText::new("Refrescar").size(11.0))
+                                .button(RichText::new("Refrescar").size(TYPO_BUTTON).color(BORDER_ACCENT))
                                 .clicked()
                             {
                                 *do_reconnect_serial = Some(current_serial.clone());
@@ -1163,7 +1203,7 @@ impl DesktopGuiApp {
                         });
                     });
 
-                    ui.add_space(8.0);
+                    ui.add_space(SPACE_2);
 
                     let bat_str = device
                         .battery_percent
@@ -1296,19 +1336,19 @@ impl DesktopGuiApp {
                     ui.horizontal_wrapped(|ui| {
                         ui.label(
                             RichText::new("CONTROL DE MODOS DE ARRANQUE E INGENIERÍA")
-                                .size(10.5)
+                                .size(TYPO_LABEL)
                                 .strong()
                                 .color(TEXT_SECONDARY),
                         );
                         if let Some((t, msg)) = &self.last_action_message {
                             if t.elapsed() < std::time::Duration::from_secs(5) {
                                 ui.label(
-                                    RichText::new(msg).size(10.5).strong().color(STATUS_GREEN),
+                                    RichText::new(msg).size(TYPO_BODY_SMALL).strong().color(STATUS_GREEN),
                                 );
                             }
                         }
                     });
-                    ui.add_space(6.0);
+                    ui.add_space(SPACE_2);
 
                     if wide {
                         ui.columns(4, |cols| {
@@ -1391,44 +1431,46 @@ impl DesktopGuiApp {
             Frame::new()
                 .fill(BG_CARD)
                 .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-                .corner_radius(CornerRadius::same(8))
-                .inner_margin(Margin::symmetric(16, 18))
+                .corner_radius(CornerRadius::same(RADIUS_MEDIUM))
+                .inner_margin(Margin::symmetric(SPACE_4 as i8, SPACE_5 as i8))
                 .show(ui, |ui| {
                     ui.set_width(ui.available_width());
                     ui.label(
                         RichText::new("Ningún Equipo Remoto Seleccionado Actualmente")
-                            .size(14.0)
+                            .size(TYPO_SUBSECTION)
                             .strong()
                             .color(Color32::WHITE),
                     );
+                    ui.add_space(SPACE_1);
                     ui.label(
                         RichText::new(
-                            "Ingrese la dirección IP:5555 o el código de la estación del cliente arriba y pulse 'CONECTAR EQUIPO'.",
+                            "Ingrese la dirección IP:5555 o el código de la estación del cliente arriba y pulse 'CONECTAR AHORA'.",
                         )
-                        .size(11.5)
+                        .size(TYPO_BODY)
                         .color(TEXT_SECONDARY),
                     );
                 });
-            ui.add_space(8.0);
+            ui.add_space(SPACE_2);
         }
 
         // COMPACT LIVE TERMINAL IN DASHBOARD
-        self.render_terminal_widget(ui, 150.0);
+        self.render_terminal_widget(ui, 160.0);
     }
 
     fn mode_action_card(ui: &mut egui::Ui, title: &str, cmd_sub: &str, accent: Color32) -> bool {
         let resp = Frame::new()
             .fill(BG_RECESSED)
             .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-            .corner_radius(CornerRadius::same(6))
-            .inner_margin(Margin::symmetric(8, 6))
+            .corner_radius(CornerRadius::same(RADIUS_SMALL))
+            .inner_margin(Margin::symmetric(SPACE_3 as i8, SPACE_2 as i8))
             .show(ui, |ui| {
                 ui.set_width(ui.available_width());
                 ui.vertical(|ui| {
-                    ui.label(RichText::new(title).size(11.5).strong().color(accent));
+                    ui.label(RichText::new(title).size(TYPO_BODY).strong().color(accent));
+                    ui.add_space(2.0);
                     ui.label(
                         RichText::new(cmd_sub)
-                            .size(9.5)
+                            .size(TYPO_LABEL)
                             .monospace()
                             .color(TEXT_MUTED),
                     );
@@ -1449,17 +1491,17 @@ impl DesktopGuiApp {
         Frame::new()
             .fill(BG_CARD)
             .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-            .corner_radius(CornerRadius::same(8))
-            .inner_margin(Margin::same(12))
+            .corner_radius(CornerRadius::same(RADIUS_MEDIUM))
+            .inner_margin(Margin::same(SPACE_3 as i8))
             .show(ui, |ui| {
                 ui.set_width(ui.available_width());
                 ui.label(
                     RichText::new("COMANDOS RÁPIDOS DE LABORATORIO GSM (1 CLIC)")
-                        .size(10.5)
+                        .size(TYPO_LABEL)
                         .strong()
                         .color(TEXT_SECONDARY),
                 );
-                ui.add_space(6.0);
+                ui.add_space(SPACE_2);
 
                 ui.horizontal_wrapped(|ui| {
                     for (label, cmd) in [
@@ -1476,7 +1518,7 @@ impl DesktopGuiApp {
                         ("Abrir Ajustes", "am start -a android.settings.SETTINGS"),
                     ] {
                         if ui
-                            .button(RichText::new(label).size(11.0))
+                            .button(RichText::new(label).size(TYPO_BUTTON))
                             .clicked()
                         {
                             quick_cmd = Some(cmd);
@@ -1489,8 +1531,8 @@ impl DesktopGuiApp {
             self.execute_shell_command(Some(c));
         }
 
-        ui.add_space(8.0);
-        self.render_terminal_widget(ui, 260.0);
+        ui.add_space(SPACE_2);
+        self.render_terminal_widget(ui, 280.0);
     }
 
     fn render_terminal_widget(&mut self, ui: &mut egui::Ui, log_height: f32) {
@@ -1499,22 +1541,22 @@ impl DesktopGuiApp {
         Frame::new()
             .fill(BG_CARD)
             .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-            .corner_radius(CornerRadius::same(8))
-            .inner_margin(Margin::same(12))
+            .corner_radius(CornerRadius::same(RADIUS_MEDIUM))
+            .inner_margin(Margin::same(SPACE_3 as i8))
             .show(ui, |ui| {
                 ui.set_width(ui.available_width());
                 ui.horizontal(|ui| {
                     ui.label(
                         RichText::new("CONSOLA TERMINAL ADB INTERACTIVA")
-                            .size(10.5)
+                            .size(TYPO_LABEL)
                             .strong()
                             .color(TEXT_SECONDARY),
                     );
                     ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                        if ui.small_button("Limpiar").clicked() {
+                        if ui.button(RichText::new("Limpiar").size(TYPO_LABEL)).clicked() {
                             self.terminal_logs.clear();
                         }
-                        if ui.small_button("Copiar Log").clicked() {
+                        if ui.button(RichText::new("Copiar Log").size(TYPO_LABEL)).clicked() {
                             let text = self
                                 .terminal_logs
                                 .iter()
@@ -1526,13 +1568,13 @@ impl DesktopGuiApp {
                     });
                 });
 
-                ui.add_space(6.0);
+                ui.add_space(SPACE_2);
 
                 Frame::new()
                     .fill(BG_RECESSED)
                     .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-                    .corner_radius(CornerRadius::same(6))
-                    .inner_margin(Margin::same(8))
+                    .corner_radius(CornerRadius::same(RADIUS_SMALL))
+                    .inner_margin(Margin::same(SPACE_2 as i8))
                     .show(ui, |ui| {
                         ui.set_width(ui.available_width());
                         ScrollArea::vertical()
@@ -1552,14 +1594,14 @@ impl DesktopGuiApp {
                                         };
                                         ui.label(
                                             RichText::new(format!("[{tag}]"))
-                                                .size(10.5)
+                                                .size(TYPO_BODY_SMALL)
                                                 .monospace()
                                                 .strong()
                                                 .color(col),
                                         );
                                         ui.label(
                                             RichText::new(line)
-                                                .size(11.0)
+                                                .size(TYPO_BODY_SMALL)
                                                 .monospace()
                                                 .color(TEXT_PRIMARY),
                                         );
@@ -1568,23 +1610,23 @@ impl DesktopGuiApp {
                             });
                     });
 
-                ui.add_space(6.0);
+                ui.add_space(SPACE_2);
 
                 ui.horizontal(|ui| {
                     ui.label(
                         RichText::new("adb >")
-                            .size(11.0)
+                            .size(TYPO_BODY)
                             .monospace()
                             .strong()
                             .color(BORDER_ACCENT),
                     );
 
-                    let w = (ui.available_width() - 95.0).max(100.0);
+                    let w = (ui.available_width() - 110.0).max(120.0);
                     let edit = ui.add_sized(
-                        [w, 26.0],
+                        [w, 32.0],
                         egui::TextEdit::singleline(&mut self.command_input)
                             .hint_text("Comando shell...")
-                            .font(egui::TextStyle::Monospace),
+                            .font(egui::FontId::new(TYPO_INPUT, FontFamily::Monospace)),
                     );
 
                     let enter =
@@ -1594,13 +1636,13 @@ impl DesktopGuiApp {
                             !self.is_command_running,
                             egui::Button::new(
                                 RichText::new("Ejecutar")
-                                    .size(11.5)
+                                    .size(TYPO_BUTTON)
                                     .strong()
                                     .color(Color32::WHITE),
                             )
                             .fill(ACCENT_BLUE_DARK)
                             .stroke(Stroke::new(1.0, ACCENT_BLUE))
-                            .min_size(Vec2::new(82.0, 26.0)),
+                            .min_size(Vec2::new(90.0, 32.0)),
                         )
                         .clicked();
 
@@ -1623,51 +1665,58 @@ impl DesktopGuiApp {
         Frame::new()
             .fill(BG_CARD)
             .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-            .corner_radius(CornerRadius::same(8))
-            .inner_margin(Margin::same(14))
+            .corner_radius(CornerRadius::same(RADIUS_MEDIUM))
+            .inner_margin(Margin::same(SPACE_4 as i8))
             .show(ui, |ui| {
                 ui.set_width(ui.available_width());
                 ui.horizontal_wrapped(|ui| {
                     ui.vertical(|ui| {
                         ui.label(
                             RichText::new("EQUIPOS MONTADOS EN EL SERVIDOR ADB DE ESTA PC")
-                                .size(11.5)
+                                .size(TYPO_SECTION_TITLE)
                                 .strong()
                                 .color(Color32::WHITE),
                         );
+                        ui.add_space(2.0);
                         ui.label(
                             RichText::new(
-                                "Lista en tiempo real de los teléfonos conectados al servidor ADB local.",
+                                "Lista en tiempo real de los teléfonos conectados al servidor ADB local (127.0.0.1:5037).",
                             )
-                            .size(11.0)
+                            .size(TYPO_BODY)
                             .color(TEXT_SECONDARY),
                         );
                     });
                     ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                        if ui.button("Actualizar Lista").clicked() {
+                        if ui.button(RichText::new("Actualizar Lista").size(TYPO_BUTTON)).clicked() {
                             self.trigger_server_devices_poll();
                         }
                     });
                 });
 
-                ui.add_space(8.0);
+                ui.add_space(SPACE_3);
                 ui.separator();
-                ui.add_space(8.0);
+                ui.add_space(SPACE_3);
 
                 if self.server_devices.is_empty() {
                     Frame::new()
                         .fill(BG_RECESSED)
                         .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-                        .corner_radius(CornerRadius::same(6))
-                        .inner_margin(Margin::symmetric(14, 20))
+                        .corner_radius(CornerRadius::same(RADIUS_SMALL))
+                        .inner_margin(Margin::symmetric(SPACE_4 as i8, SPACE_6 as i8))
                         .show(ui, |ui| {
                             ui.set_width(ui.available_width());
                             ui.vertical_centered(|ui| {
                                 ui.label(
                                     RichText::new("No hay dispositivos activos en adb devices")
-                                        .size(13.0)
+                                        .size(TYPO_SUBSECTION)
                                         .strong()
                                         .color(TEXT_SECONDARY),
+                                );
+                                ui.add_space(SPACE_1);
+                                ui.label(
+                                    RichText::new("Conecte un teléfono USB o ingrese el código de un cliente para montarlo.")
+                                        .size(TYPO_BODY)
+                                        .color(TEXT_MUTED),
                                 );
                             });
                         });
@@ -1677,8 +1726,8 @@ impl DesktopGuiApp {
                         Frame::new()
                             .fill(BG_RECESSED)
                             .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-                            .corner_radius(CornerRadius::same(6))
-                            .inner_margin(Margin::same(10))
+                            .corner_radius(CornerRadius::same(RADIUS_SMALL))
+                            .inner_margin(Margin::same(SPACE_3 as i8))
                             .show(ui, |ui| {
                                 ui.set_width(ui.available_width());
                                 ui.horizontal_wrapped(|ui| {
@@ -1686,7 +1735,7 @@ impl DesktopGuiApp {
                                         ui.horizontal_wrapped(|ui| {
                                             ui.label(
                                                 RichText::new(dev.display_name())
-                                                    .size(13.5)
+                                                    .size(TYPO_SUBSECTION)
                                                     .strong()
                                                     .color(Color32::WHITE),
                                             );
@@ -1706,6 +1755,7 @@ impl DesktopGuiApp {
                                                 );
                                             }
                                         });
+                                        ui.add_space(2.0);
                                         ui.label(
                                             RichText::new(format!(
                                                 "ID: {}  •  Estado: {}  •  Android: {}",
@@ -1713,7 +1763,7 @@ impl DesktopGuiApp {
                                                 dev.state,
                                                 dev.android_version.as_deref().unwrap_or("N/D")
                                             ))
-                                            .size(11.0)
+                                            .size(TYPO_BODY_SMALL)
                                             .monospace()
                                             .color(TEXT_SECONDARY),
                                         );
@@ -1722,8 +1772,10 @@ impl DesktopGuiApp {
                                     ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                                         if dev.is_network_device() {
                                             if ui
-                                                .small_button(
-                                                    RichText::new("Desconectar").color(STATUS_RED),
+                                                .button(
+                                                    RichText::new("Desconectar")
+                                                        .size(TYPO_BUTTON)
+                                                        .color(STATUS_RED),
                                                 )
                                                 .clicked()
                                             {
@@ -1731,8 +1783,9 @@ impl DesktopGuiApp {
                                             }
                                         }
                                         if ui
-                                            .small_button(
+                                            .button(
                                                 RichText::new("Seleccionar")
+                                                    .size(TYPO_BUTTON)
                                                     .strong()
                                                     .color(BORDER_ACCENT),
                                             )
@@ -1746,7 +1799,7 @@ impl DesktopGuiApp {
                                     });
                                 });
                             });
-                        ui.add_space(6.0);
+                        ui.add_space(SPACE_2);
                     }
                 }
             });
@@ -1756,22 +1809,23 @@ impl DesktopGuiApp {
         Frame::new()
             .fill(BG_CARD)
             .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-            .corner_radius(CornerRadius::same(8))
-            .inner_margin(Margin::same(14))
+            .corner_radius(CornerRadius::same(RADIUS_MEDIUM))
+            .inner_margin(Margin::same(SPACE_4 as i8))
             .show(ui, |ui| {
                 ui.set_width(ui.available_width());
                 ui.label(
                     RichText::new("TUTORIAL: FLUJO DE CONEXIÓN CON EL CLIENTE REMOTO")
-                        .size(12.0)
+                        .size(TYPO_SECTION_TITLE)
                         .strong()
                         .color(BORDER_ACCENT),
                 );
+                ui.add_space(2.0);
                 ui.label(
                     RichText::new("Guía de 3 pasos para vincular clientes en cualquier parte del mundo sin configuración de puertos.")
-                        .size(10.5)
+                        .size(TYPO_BODY)
                         .color(TEXT_MUTED),
                 );
-                ui.add_space(8.0);
+                ui.add_space(SPACE_3);
 
                 let steps = [
                     (
@@ -1798,41 +1852,42 @@ impl DesktopGuiApp {
                     Frame::new()
                         .fill(BG_RECESSED)
                         .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-                        .corner_radius(CornerRadius::same(6))
-                        .inner_margin(Margin::same(10))
+                        .corner_radius(CornerRadius::same(RADIUS_SMALL))
+                        .inner_margin(Margin::same(SPACE_3 as i8))
                         .show(ui, |ui| {
                             ui.set_width(ui.available_width());
                             ui.horizontal(|ui| {
                                 Frame::new()
                                     .fill(Color32::from_rgba_unmultiplied(accent.r(), accent.g(), accent.b(), 35))
                                     .stroke(Stroke::new(1.0, accent))
-                                    .corner_radius(CornerRadius::same(4))
-                                    .inner_margin(Margin::symmetric(8, 4))
+                                    .corner_radius(CornerRadius::same(RADIUS_SMALL))
+                                    .inner_margin(Margin::symmetric(SPACE_3 as i8, SPACE_2 as i8))
                                     .show(ui, |ui| {
-                                        ui.label(RichText::new(num).size(13.0).strong().color(accent));
+                                        ui.label(RichText::new(num).size(TYPO_SUBSECTION).strong().color(accent));
                                     });
 
+                                ui.add_space(SPACE_2);
                                 ui.vertical(|ui| {
-                                    ui.label(RichText::new(title).size(12.0).strong().color(Color32::WHITE));
+                                    ui.label(RichText::new(title).size(TYPO_BODY_LARGE).strong().color(Color32::WHITE));
                                     ui.add_space(2.0);
-                                    ui.label(RichText::new(desc).size(10.5).color(TEXT_SECONDARY));
+                                    ui.label(RichText::new(desc).size(TYPO_BODY).color(TEXT_SECONDARY));
                                 });
                             });
                         });
-                    ui.add_space(6.0);
+                    ui.add_space(SPACE_2);
                 }
 
-                ui.add_space(10.0);
+                ui.add_space(SPACE_3);
                 ui.separator();
-                ui.add_space(8.0);
+                ui.add_space(SPACE_3);
 
                 ui.label(
                     RichText::new("INTEGRACIÓN CON SOFTWARE GSM DE TERCEROS")
-                        .size(11.5)
+                        .size(TYPO_SUBSECTION)
                         .strong()
                         .color(BORDER_ACCENT),
                 );
-                ui.add_space(6.0);
+                ui.add_space(SPACE_2);
 
                 for (title, body) in [
                     (
@@ -1847,20 +1902,20 @@ impl DesktopGuiApp {
                     Frame::new()
                         .fill(BG_RECESSED)
                         .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-                        .corner_radius(CornerRadius::same(6))
-                        .inner_margin(Margin::same(10))
+                        .corner_radius(CornerRadius::same(RADIUS_SMALL))
+                        .inner_margin(Margin::same(SPACE_3 as i8))
                         .show(ui, |ui| {
                             ui.set_width(ui.available_width());
                             ui.label(
                                 RichText::new(title)
-                                    .size(11.5)
+                                    .size(TYPO_BODY_LARGE)
                                     .strong()
                                     .color(Color32::WHITE),
                             );
-                            ui.add_space(3.0);
-                            ui.label(RichText::new(body).size(10.5).color(TEXT_SECONDARY));
+                            ui.add_space(SPACE_1);
+                            ui.label(RichText::new(body).size(TYPO_BODY).color(TEXT_SECONDARY));
                         });
-                    ui.add_space(6.0);
+                    ui.add_space(SPACE_2);
                 }
             });
     }
@@ -1869,90 +1924,91 @@ impl DesktopGuiApp {
         Frame::new()
             .fill(BG_CARD)
             .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-            .corner_radius(CornerRadius::same(8))
-            .inner_margin(Margin::same(16))
+            .corner_radius(CornerRadius::same(RADIUS_MEDIUM))
+            .inner_margin(Margin::same(SPACE_4 as i8))
             .show(ui, |ui| {
                 ui.set_width(ui.available_width());
                 ui.label(
                     RichText::new("DESCARGA DE APK CLIENTE — CÓDIGO QR Y ENLACE DIRECTO")
-                        .size(13.0)
+                        .size(TYPO_SECTION_TITLE)
                         .strong()
                         .color(BORDER_ACCENT),
                 );
+                ui.add_space(2.0);
                 ui.label(
                     RichText::new(
                         "Comparta este código QR o enlace con el cliente remoto para que instale 'adbhub-client.apk' en su teléfono Android OTG.",
                     )
-                    .size(10.5)
+                    .size(TYPO_BODY)
                     .color(TEXT_MUTED),
                 );
 
-                ui.add_space(14.0);
+                ui.add_space(SPACE_4);
 
                 ui.horizontal_top(|ui| {
                     // Columna Izquierda: QR Grande de alto contraste
                     Frame::new()
                         .fill(Color32::WHITE)
                         .stroke(Stroke::new(2.0, BORDER_ACCENT))
-                        .corner_radius(CornerRadius::same(10))
-                        .inner_margin(Margin::same(14))
+                        .corner_radius(CornerRadius::same(RADIUS_LARGE))
+                        .inner_margin(Margin::same(SPACE_4 as i8))
                         .show(ui, |ui| {
                             ui.vertical_centered(|ui| {
                                 if let Some(tex) = &self.qr_texture {
-                                    ui.image((tex.id(), Vec2::new(210.0, 210.0)));
+                                    ui.image((tex.id(), Vec2::new(220.0, 220.0)));
                                 } else {
                                     ui.label(
                                         RichText::new("Generando código QR...")
-                                            .size(11.0)
+                                            .size(TYPO_BODY)
                                             .color(Color32::BLACK),
                                     );
                                 }
-                                ui.add_space(6.0);
+                                ui.add_space(SPACE_2);
                                 ui.label(
                                     RichText::new("Escanear con Cámara o App QR")
-                                        .size(10.5)
+                                        .size(TYPO_BODY)
                                         .strong()
                                         .color(Color32::from_rgb(15, 23, 42)),
                                 );
                             });
                         });
 
-                    ui.add_space(16.0);
+                    ui.add_space(SPACE_4);
 
                     // Columna Derecha: Enlace MediaFire, botones y pasos
                     ui.vertical(|ui| {
                         ui.label(
                             RichText::new("ENLACE DIRECTO DE DESCARGA (MEDIAFIRE):")
-                                .size(10.0)
+                                .size(TYPO_LABEL)
                                 .strong()
                                 .color(TEXT_SECONDARY),
                         );
-                        ui.add_space(4.0);
+                        ui.add_space(SPACE_1);
 
                         Frame::new()
                             .fill(BG_RECESSED)
                             .stroke(Stroke::new(1.0, Color32::from_rgb(38, 56, 84)))
-                            .corner_radius(CornerRadius::same(6))
-                            .inner_margin(Margin::same(10))
+                            .corner_radius(CornerRadius::same(RADIUS_SMALL))
+                            .inner_margin(Margin::same(SPACE_3 as i8))
                             .show(ui, |ui| {
                                 ui.set_width(ui.available_width());
                                 ui.horizontal(|ui| {
                                     ui.label(
                                         RichText::new(APK_MEDIAFIRE_URL)
-                                            .size(10.5)
+                                            .size(TYPO_BODY)
                                             .color(Color32::from_rgb(56, 189, 248))
                                             .monospace(),
                                     );
                                 });
                             });
 
-                        ui.add_space(8.0);
+                        ui.add_space(SPACE_3);
 
                         ui.horizontal(|ui| {
                             if ui
                                 .button(
                                     RichText::new("Copiar Enlace al Portapapeles")
-                                        .size(11.0)
+                                        .size(TYPO_BUTTON)
                                         .strong()
                                         .color(Color32::WHITE),
                                 )
@@ -1973,7 +2029,7 @@ impl DesktopGuiApp {
                             if ui
                                 .button(
                                     RichText::new("Abrir en Navegador")
-                                        .size(11.0)
+                                        .size(TYPO_BUTTON)
                                         .color(BORDER_ACCENT),
                                 )
                                 .clicked()
@@ -1993,23 +2049,23 @@ impl DesktopGuiApp {
                             }
                         });
 
-                        ui.add_space(14.0);
+                        ui.add_space(SPACE_4);
 
                         // Tarjeta de Instrucciones para el Cliente
                         Frame::new()
                             .fill(BG_RECESSED)
                             .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-                            .corner_radius(CornerRadius::same(6))
-                            .inner_margin(Margin::same(12))
+                            .corner_radius(CornerRadius::same(RADIUS_SMALL))
+                            .inner_margin(Margin::same(SPACE_3 as i8))
                             .show(ui, |ui| {
                                 ui.set_width(ui.available_width());
                                 ui.label(
                                     RichText::new("INSTRUCCIONES RÁPIDAS PARA EL CLIENTE:")
-                                        .size(10.0)
+                                        .size(TYPO_LABEL)
                                         .strong()
                                         .color(Color32::WHITE),
                                 );
-                                ui.add_space(6.0);
+                                ui.add_space(SPACE_2);
 
                                 for (num, text) in [
                                     (
@@ -2032,17 +2088,18 @@ impl DesktopGuiApp {
                                     ui.horizontal_top(|ui| {
                                         ui.label(
                                             RichText::new(format!("[{num}]"))
-                                                .size(10.0)
+                                                .size(TYPO_BODY_SMALL)
                                                 .strong()
                                                 .color(BORDER_ACCENT),
                                         );
+                                        ui.add_space(SPACE_1);
                                         ui.label(
                                             RichText::new(text)
-                                                .size(10.0)
+                                                .size(TYPO_BODY)
                                                 .color(TEXT_SECONDARY),
                                         );
                                     });
-                                    ui.add_space(3.0);
+                                    ui.add_space(SPACE_1);
                                 }
                             });
                     });
@@ -2164,7 +2221,7 @@ impl eframe::App for DesktopGuiApp {
             .frame(
                 Frame::new()
                     .fill(BG_SIDEBAR)
-                    .inner_margin(Margin::symmetric(14, 6))
+                    .inner_margin(Margin::symmetric(SPACE_MD as i8, SPACE_XS as i8))
                     .stroke(Stroke::new(1.0, BORDER_SUBTLE)),
             )
             .show(ui, |ui| {
@@ -2173,7 +2230,7 @@ impl eframe::App for DesktopGuiApp {
                         RichText::new(
                             "ADBHUB-LINK Desktop v2.0 • Laboratorio GSM & Puente ADB • 127.0.0.1:5037",
                         )
-                        .size(10.5)
+                        .size(TYPO_BODY_SMALL)
                         .color(TEXT_MUTED),
                     );
                 });
@@ -2184,7 +2241,7 @@ impl eframe::App for DesktopGuiApp {
             .frame(
                 Frame::new()
                     .fill(BG_CANVAS)
-                    .inner_margin(Margin::symmetric(14, 12)),
+                    .inner_margin(Margin::symmetric(SPACE_MD as i8, SPACE_SM as i8)),
             )
             .show(ui, |ui| {
                 self.render_connection_header(
@@ -2194,7 +2251,7 @@ impl eframe::App for DesktopGuiApp {
                     &mut do_disconnect,
                 );
 
-                ui.add_space(8.0);
+                ui.add_space(SPACE_SM);
 
                 ScrollArea::vertical()
                     .id_salt("tech_main_workspace_scroll")
