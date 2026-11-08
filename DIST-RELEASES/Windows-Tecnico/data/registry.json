@@ -7,7 +7,7 @@
       "platform": "Windows 10/11 x64",
       "version": "0.1.0",
       "online": true,
-      "last_seen": "2026-11-08T01:47:19.454402900Z",
+      "last_seen": "2026-11-08T16:28:43.692483500Z",
       "agent_public_key": "ed25519:local-host-agent-key"
     }
   ],
@@ -59,6 +59,28 @@
       "updated_at": "2026-11-08T01:34:41.813960300Z"
     },
     {
+      "id": "43a01f6f-23d2-45d4-88f6-2890fe112581",
+      "agent_id": "4ae81017-eda8-4c3c-99ca-fa6ae345f66e",
+      "busid": {
+        "bus": 1,
+        "port_chain": [
+          2
+        ]
+      },
+      "vendor_id": 3725,
+      "product_id": 8220,
+      "manufacturer": "MediaTek",
+      "product_name": "Android ADB Interface",
+      "serial_hash": "ccd794e018e89c15563656eb545706ff383764b7a01bcf77a5837bf0f1c5716b",
+      "interface_descriptors": [],
+      "device_state": "SHARED",
+      "usb_mode": "AndroidAdb",
+      "odin_compatibility": "Unknown",
+      "online": true,
+      "shared": true,
+      "updated_at": "2026-11-08T16:28:43.692483500Z"
+    },
+    {
       "id": "b7e68425-bec4-4d2d-ab86-18b72e11ee61",
       "agent_id": "4ae81017-eda8-4c3c-99ca-fa6ae345f66e",
       "busid": {
@@ -79,29 +101,7 @@
       "odin_compatibility": "Unknown",
       "online": false,
       "shared": true,
-      "updated_at": "2026-11-08T01:47:19.454402900Z"
-    },
-    {
-      "id": "43a01f6f-23d2-45d4-88f6-2890fe112581",
-      "agent_id": "4ae81017-eda8-4c3c-99ca-fa6ae345f66e",
-      "busid": {
-        "bus": 1,
-        "port_chain": [
-          2
-        ]
-      },
-      "vendor_id": 1256,
-      "product_id": 26720,
-      "manufacturer": "SAMSUNG Electronics Co., Ltd.",
-      "product_name": "SAMSUNG Mobile USB Composite Device",
-      "serial_hash": "d5bf8f25f621b76ee3e2e1cca6576100d3503d12308da4216b9e390fd48b9578",
-      "interface_descriptors": [],
-      "device_state": "DISCONNECTED",
-      "usb_mode": "Mtp",
-      "odin_compatibility": "Unknown",
-      "online": false,
-      "shared": true,
-      "updated_at": "2026-11-08T01:47:19.454402900Z"
+      "updated_at": "2026-11-08T16:28:43.692483500Z"
     }
   ]
 }

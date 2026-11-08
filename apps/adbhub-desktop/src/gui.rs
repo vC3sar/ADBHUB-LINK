@@ -625,7 +625,7 @@ impl DesktopGuiApp {
                     ui,
                     &mut self.active_nav,
                     TechNavTab::TerminalPro,
-                    "02  Consola ADB Pro",
+                    "02  Consola ADB",
                     "Shell y diagnósticos 1-clic",
                 );
                 ui.add_space(4.0);
