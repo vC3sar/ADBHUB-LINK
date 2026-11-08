@@ -38,6 +38,7 @@ const STATUS_AMBER_BG: Color32 = Color32::from_rgb(69, 39, 7);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum ClientTab {
+    Tutorial,
     Devices,
     BrandGuide,
     ActivityLog,
@@ -742,6 +743,12 @@ impl AgentGuiApp {
             .show(ui, |ui| {
                 ui.set_width(ui.available_width());
                 ui.horizontal_wrapped(|ui| {
+                    Self::tab_button(
+                        ui,
+                        &mut self.active_tab,
+                        ClientTab::Tutorial,
+                        "Como Conectarse (Guia)",
+                    );
                     let dev_count = self.local_adb_devices.len() + self.detected_usb_mobiles.len();
                     Self::tab_button(
                         ui,
@@ -770,6 +777,7 @@ impl AgentGuiApp {
             .id_salt("right_workspace_scroll")
             .auto_shrink([false, false])
             .show(ui, |ui| match self.active_tab {
+                ClientTab::Tutorial => self.render_tutorial_tab(ui),
                 ClientTab::Devices => self.render_devices_tab(ui),
                 ClientTab::BrandGuide => self.render_brand_guide_tab(ui),
                 ClientTab::ActivityLog => self.render_activity_log_tab(ui),
@@ -798,6 +806,99 @@ impl AgentGuiApp {
         if ui.add(btn).clicked() {
             *current = target;
         }
+    }
+
+    fn render_tutorial_tab(&mut self, ui: &mut egui::Ui) {
+        Frame::new()
+            .fill(BG_CARD)
+            .stroke(Stroke::new(1.0, BORDER_SUBTLE))
+            .corner_radius(CornerRadius::same(8))
+            .inner_margin(Margin::same(14))
+            .show(ui, |ui| {
+                ui.set_width(ui.available_width());
+                ui.label(
+                    RichText::new("GUÍA RÁPIDA: CÓMO CONECTARSE CON SU TÉCNICO")
+                        .size(12.0)
+                        .strong()
+                        .color(BORDER_ACCENT),
+                );
+                ui.label(
+                    RichText::new("Siga estos 3 sencillos pasos para permitir el soporte remoto en su dispositivo.")
+                        .size(10.5)
+                        .color(TEXT_MUTED),
+                );
+                ui.add_space(8.0);
+
+                let steps = [
+                    (
+                        "1",
+                        "Conecte el Teléfono por Cable USB a esta PC",
+                        "Use un cable de datos en buen estado. Desbloquee la pantalla del móvil. Si aparece un aviso de 'Modo USB', elija 'Transferir archivos (MTP)'.",
+                        Color32::from_rgb(14, 165, 233),
+                    ),
+                    (
+                        "2",
+                        "Comparta su Código de Estación con el Técnico",
+                        "En el panel izquierdo verá su 'Código de Emparejamiento' de 16 caracteres. Pulse 'COPIAR CÓDIGO DE ESTACIÓN' y envíeselo a su técnico por WhatsApp o chat.",
+                        Color32::from_rgb(245, 158, 11),
+                    ),
+                    (
+                        "3",
+                        "Acepte la Huella de Seguridad en su Celular",
+                        "Cuando el técnico inicie la conexión, saldrá una ventana en el teléfono: '¿Permitir depuración por USB?'. Marque la casilla 'Permitir siempre' y toque ACEPTAR.",
+                        Color32::from_rgb(16, 185, 129),
+                    ),
+                ];
+
+                for (num, title, desc, accent) in steps {
+                    Frame::new()
+                        .fill(BG_RECESSED)
+                        .stroke(Stroke::new(1.0, BORDER_SUBTLE))
+                        .corner_radius(CornerRadius::same(6))
+                        .inner_margin(Margin::same(10))
+                        .show(ui, |ui| {
+                            ui.set_width(ui.available_width());
+                            ui.horizontal(|ui| {
+                                Frame::new()
+                                    .fill(Color32::from_rgba_unmultiplied(accent.r(), accent.g(), accent.b(), 35))
+                                    .stroke(Stroke::new(1.0, accent))
+                                    .corner_radius(CornerRadius::same(4))
+                                    .inner_margin(Margin::symmetric(8, 4))
+                                    .show(ui, |ui| {
+                                        ui.label(RichText::new(num).size(13.0).strong().color(accent));
+                                    });
+
+                                ui.vertical(|ui| {
+                                    ui.label(RichText::new(title).size(12.0).strong().color(Color32::WHITE));
+                                    ui.add_space(2.0);
+                                    ui.label(RichText::new(desc).size(10.5).color(TEXT_SECONDARY));
+                                });
+                            });
+                        });
+                    ui.add_space(6.0);
+                }
+
+                ui.add_space(4.0);
+                Frame::new()
+                    .fill(Color32::from_rgb(12, 22, 38))
+                    .stroke(Stroke::new(1.0, Color32::from_rgb(25, 50, 85)))
+                    .corner_radius(CornerRadius::same(6))
+                    .inner_margin(Margin::same(10))
+                    .show(ui, |ui| {
+                        ui.set_width(ui.available_width());
+                        ui.label(
+                            RichText::new("¿Su teléfono no es detectado?")
+                                .size(11.0)
+                                .strong()
+                                .color(BORDER_ACCENT),
+                        );
+                        ui.label(
+                            RichText::new("Consulte la pestaña 'Guía Paso a Paso por Marca' en la barra superior para ver cómo activar 'Depuración por USB' en Samsung, Xiaomi, Motorola, Tecno o Huawei.")
+                                .size(10.0)
+                                .color(TEXT_MUTED),
+                        );
+                    });
+            });
     }
 
     fn render_devices_tab(&mut self, ui: &mut egui::Ui) {

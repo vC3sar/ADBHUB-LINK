@@ -1679,25 +1679,87 @@ impl DesktopGuiApp {
             .show(ui, |ui| {
                 ui.set_width(ui.available_width());
                 ui.label(
-                    RichText::new("ARQUITECTURA DE INTEGRACIÓN CON SOFTWARE GSM DE TERCEROS")
+                    RichText::new("TUTORIAL: FLUJO DE CONEXIÓN CON EL CLIENTE REMOTO")
+                        .size(12.0)
+                        .strong()
+                        .color(BORDER_ACCENT),
+                );
+                ui.label(
+                    RichText::new("Guía de 3 pasos para vincular clientes en cualquier parte del mundo sin configuración de puertos.")
+                        .size(10.5)
+                        .color(TEXT_MUTED),
+                );
+                ui.add_space(8.0);
+
+                let steps = [
+                    (
+                        "1",
+                        "Solicite el Código de 16 caracteres al Cliente",
+                        "Indique al cliente que abra 'adbhub-agent.exe' (Windows), 'ADBHUB-LINK.sh' (Linux) o 'adbhub-client.apk' (Android OTG) y pulse 'COPIAR CÓDIGO DE ESTACIÓN'.",
+                        Color32::from_rgb(14, 165, 233),
+                    ),
+                    (
+                        "2",
+                        "Pegue el Código en la Barra Superior y presione Conectar",
+                        "Use el botón 'Pegar' o 'Ctrl+V'. La aplicación decodificará automáticamente el túnel de internet ('bore.pub:<puerto>') o la IP local y establecerá el enlace ADB sin consolas.",
+                        Color32::from_rgb(245, 158, 11),
+                    ),
+                    (
+                        "3",
+                        "El Cliente Autoriza la Huella RSA en la Pantalla del Móvil",
+                        "Al conectar, saltará en el celular del cliente la ventana: '¿Permitir depuración por USB?'. El cliente debe marcar 'Permitir siempre' y tocar Aceptar. En ese instante el equipo quedará en estado 'device' listo para UnlockTool, Chimera, SamFirm o Consola ADB.",
+                        Color32::from_rgb(16, 185, 129),
+                    ),
+                ];
+
+                for (num, title, desc, accent) in steps {
+                    Frame::new()
+                        .fill(BG_RECESSED)
+                        .stroke(Stroke::new(1.0, BORDER_SUBTLE))
+                        .corner_radius(CornerRadius::same(6))
+                        .inner_margin(Margin::same(10))
+                        .show(ui, |ui| {
+                            ui.set_width(ui.available_width());
+                            ui.horizontal(|ui| {
+                                Frame::new()
+                                    .fill(Color32::from_rgba_unmultiplied(accent.r(), accent.g(), accent.b(), 35))
+                                    .stroke(Stroke::new(1.0, accent))
+                                    .corner_radius(CornerRadius::same(4))
+                                    .inner_margin(Margin::symmetric(8, 4))
+                                    .show(ui, |ui| {
+                                        ui.label(RichText::new(num).size(13.0).strong().color(accent));
+                                    });
+
+                                ui.vertical(|ui| {
+                                    ui.label(RichText::new(title).size(12.0).strong().color(Color32::WHITE));
+                                    ui.add_space(2.0);
+                                    ui.label(RichText::new(desc).size(10.5).color(TEXT_SECONDARY));
+                                });
+                            });
+                        });
+                    ui.add_space(6.0);
+                }
+
+                ui.add_space(10.0);
+                ui.separator();
+                ui.add_space(8.0);
+
+                ui.label(
+                    RichText::new("INTEGRACIÓN CON SOFTWARE GSM DE TERCEROS")
                         .size(11.5)
                         .strong()
                         .color(BORDER_ACCENT),
                 );
-                ui.add_space(8.0);
+                ui.add_space(6.0);
 
                 for (title, body) in [
                     (
-                        "1. ¿Cómo ven el teléfono remoto programas como UnlockTool, Chimera o SamFirm?",
-                        "Cuando usted pulsa 'CONECTAR EQUIPO', ADBHUB-LINK monta el dispositivo del cliente dentro del demonio local de Windows (127.0.0.1:5037). Cualquier herramienta GSM que consulte el servidor ADB estándar detectará el teléfono de forma automática.",
+                        "¿Cómo ven el teléfono remoto programas como UnlockTool, Chimera o SamFirm?",
+                        "Cuando pulsa 'CONECTAR AHORA', ADBHUB-LINK monta el dispositivo remoto dentro del demonio local de Windows (127.0.0.1:5037). Cualquier herramienta GSM que consulte el servidor ADB detectará el teléfono automáticamente.",
                     ),
                     (
-                        "2. Flujo de Trabajo Recomendado con Clientes en Windows o Linux",
-                        "• En PC Cliente Windows: el cliente abre 'adbhub-agent.exe', conecta su móvil por USB y pulsa 'Activar Puente 5555'.\n• En PC Cliente Linux: el cliente ejecuta './iniciar-cliente.sh', exponiendo el móvil en el puerto 5555.\n• En su Estación de Técnico: ingrese la IP:5555 del cliente y pulse 'CONECTAR EQUIPO'.",
-                    ),
-                    (
-                        "3. Binarios Oficiales Incluidos (Cero Consolas)",
-                        "Incluye Android SDK Platform-Tools v36 oficial firmado por Google (adb.exe, AdbWinApi.dll y AdbWinUsbApi.dll) configurado con ejecución silenciosa CREATE_NO_WINDOW.",
+                        "Compatibilidad Celular a Celular (USB-C OTG sin PC)",
+                        "Si el cliente no tiene PC, puede instalar 'adbhub-client.apk' en otro celular Android y conectarlo al móvil a reparar mediante un cable USB-C a USB-C. El APK expone el túnel y usted lo controla desde aquí igual que si estuviera en una computadora.",
                     ),
                 ] {
                     Frame::new()
@@ -1709,12 +1771,12 @@ impl DesktopGuiApp {
                             ui.set_width(ui.available_width());
                             ui.label(
                                 RichText::new(title)
-                                    .size(12.0)
+                                    .size(11.5)
                                     .strong()
                                     .color(Color32::WHITE),
                             );
                             ui.add_space(3.0);
-                            ui.label(RichText::new(body).size(11.0).color(TEXT_SECONDARY));
+                            ui.label(RichText::new(body).size(10.5).color(TEXT_SECONDARY));
                         });
                     ui.add_space(6.0);
                 }

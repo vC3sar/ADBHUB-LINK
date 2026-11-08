@@ -722,23 +722,23 @@ def start_gui(code, local_ip):
 
         tk.Label(
             guide_card,
-            text="GUÍA RÁPIDA DE CONEXIÓN PARA EL CLIENTE",
-            font=("DejaVu Sans", 9, "bold"),
+            text="TUTORIAL: CONEXIÓN REMOTA CON EL TÉCNICO",
+            font=("DejaVu Sans", 10, "bold"),
             fg="#38bdf8",
             bg=BG_CARD,
         ).pack(anchor="w", pady=(0, 6))
 
         guide_text = (
-            "1. Conecte el teléfono Android por cable USB a esta computadora Linux.\n"
+            "1. Conecte el teléfono Android por cable USB a esta computadora.\n"
             "2. En el teléfono: Ajustes > Acerca del teléfono > Toque 7 veces 'Número de compilación'.\n"
             "3. En Opciones para desarrolladores: active 'Depuración por USB'.\n"
-            "4. Acepte la ventana 'Permitir depuración por USB' en la pantalla del teléfono.\n"
-            "5. El técnico podrá conectarse ingresando " + endpoint_str + " en su estación."
+            "4. En esta pantalla, pulse 'COPIAR CÓDIGO DE ESTACIÓN' y envíeselo al técnico.\n"
+            "5. Cuando el técnico se conecte, en la pantalla del celular saldrá un aviso: marque 'Permitir siempre' y toque ACEPTAR."
         )
         tk.Label(
             guide_card,
             text=guide_text,
-            font=("DejaVu Sans", 10),
+            font=("DejaVu Sans", 9),
             fg=TEXT_PRIMARY,
             bg=BG_CARD,
             justify="left",
