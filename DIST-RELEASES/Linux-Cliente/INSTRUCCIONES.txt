@@ -1,19 +1,21 @@
-================================================================================
- ADBHUB-LINK — CLIENTE PARA LINUX / LUBUNTU / UBUNTU
-================================================================================
+========================================================================
+  ADBHUB-LINK — ESTACIÓN DEL CLIENTE PARA LINUX (Ubuntu / Lubuntu / Debian)
+========================================================================
 
-DESCRIPCIÓN:
-Cliente ligero con puente ADB USB para sistemas Linux.
+USO (UN SOLO ARCHIVO):
+Para iniciar la aplicación, simplemente abra una terminal en esta carpeta y ejecute:
 
-OPCIONES DE USO (1 SOLO CLIC):
-1. Si es la primera vez que se usa en el equipo:
-   bash install-linux.sh
-   (Instala dependencias, reglas udev y crea acceso directo en el escritorio).
+    bash ADBHUB-LINK.sh
 
-2. Para iniciar en cualquier momento:
-   Hacer doble clic en "ADBHUB-Cliente.desktop" en el escritorio
-   O en terminal: ./iniciar-cliente.sh
+¿CÓMO FUNCIONA?
+- Primera vez: Comprueba automáticamente si el sistema tiene `adb`, `python3`,
+  la interfaz gráfica (`python3-tk`) y los permisos USB (`plugdev`/`udev`).
+  Si falta algo, lo instala y configura automáticamente, creando un acceso directo
+  en el Escritorio.
+- Siguientes veces: Detecta que todo ya está instalado y abre la interfaz gráfica
+  directamente en 1 segundo.
 
-3. Comparte la IP:5555 o el código AnyDesk mostrado con el técnico.
-================================================================================
-
+OPCIONES AVANZADAS:
+- Modo silencioso en segundo plano (para servidores sin monitor o por SSH):
+    bash ADBHUB-LINK.sh --daemon
+========================================================================
