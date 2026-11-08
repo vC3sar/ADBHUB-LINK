@@ -103,3 +103,4 @@ Con eso quedamos conectados para comenzar el trabajo.
   *Sí.* El código de 16 caracteres incluye el puerto del relay mundial, por lo que se enlaza sin restricciones de red local.
 * **¿Qué pasa si el cliente desconecta el cable por accidente?**  
   Basta con volver a enchufar el cable. La app del técnico cuenta con el botón *"Reconectar Enlace"* para reanudar la sesión en 1 segundo.
+

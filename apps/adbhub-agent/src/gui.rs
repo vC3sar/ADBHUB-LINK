@@ -154,8 +154,13 @@ impl AgentGuiApp {
 
         let prop_candidates = [
             "C:\\Windows\\Fonts\\segoeui.ttf",
+            "C:\\Windows\\Fonts\\segoeuib.ttf",
+            "C:\\Windows\\Fonts\\calibri.ttf",
+            "C:\\Windows\\Fonts\\arial.ttf",
+            "/usr/share/fonts/truetype/inter/Inter-Regular.ttf",
             "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",
             "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+            "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
         ];
         for path in prop_candidates {
             if let Ok(bytes) = std::fs::read(path) {
@@ -170,9 +175,14 @@ impl AgentGuiApp {
         }
 
         let mono_candidates = [
+            "C:\\Windows\\Fonts\\CascadiaCode.ttf",
+            "C:\\Windows\\Fonts\\CascadiaMono.ttf",
             "C:\\Windows\\Fonts\\consola.ttf",
+            "/usr/share/fonts/truetype/jetbrains-mono/JetBrainsMono-Regular.ttf",
+            "/usr/share/fonts/truetype/cascadia-code/CascadiaCode.ttf",
             "/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf",
             "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+            "/usr/share/fonts/truetype/freefont/FreeMono.ttf",
         ];
         for path in mono_candidates {
             if let Ok(bytes) = std::fs::read(path) {
@@ -1369,9 +1379,20 @@ impl AgentGuiApp {
 
 impl eframe::App for AgentGuiApp {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+        // Escala responsiva autoadaptativa según resolución de ventana/pantalla
+        let ctx = ui.ctx().clone();
+        let current_zoom = ctx.zoom_factor();
+        let viewport_width = ctx
+            .input(|i| i.viewport().inner_rect.map(|r| r.width()))
+            .unwrap_or(1280.0);
+        let physical_width = viewport_width * current_zoom;
+        let target_zoom = (physical_width / 1366.0).clamp(0.90, 1.30);
+        if (target_zoom - current_zoom).abs() > 0.04 {
+            ctx.set_zoom_factor(target_zoom);
+        }
+
         self.poll_hardware_updates();
 
-        let ctx = ui.ctx().clone();
         ctx.request_repaint_after(std::time::Duration::from_millis(1500));
 
         if !self.scan_in_progress && self.last_scan.elapsed() > std::time::Duration::from_secs(3) {
@@ -1522,8 +1543,9 @@ impl eframe::App for AgentGuiApp {
 pub fn run_agent_native_gui() -> Result<(), eframe::Error> {
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-            .with_inner_size([840.0, 560.0])
+            .with_inner_size([1040.0, 680.0])
             .with_min_inner_size([640.0, 420.0])
+            .with_maximized(true)
             .with_title("ADBHUB-LINK — Estación del Cliente"),
         ..Default::default()
     };

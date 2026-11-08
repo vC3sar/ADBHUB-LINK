@@ -381,6 +381,17 @@ public class MainActivity extends Activity implements OtgAdbBridge.BridgeLogger,
     // ========================================================================
     // CONSTRUCCIÓN PROGRAMÁTICA DE LA INTERFAZ ENTERPRISE DARK SLATE
     // ========================================================================
+    private float getAdaptiveScale() {
+        android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
+        float widthDp = dm.widthPixels / dm.density;
+        // Escala responsiva autoadaptativa entre 0.92x (teléfonos compactos) y 1.35x (tablets/foldables)
+        return Math.max(0.92f, Math.min(1.35f, widthDp / 390f));
+    }
+
+    private float sp(float baseSp) {
+        return baseSp * getAdaptiveScale();
+    }
+
     private View buildEnterpriseUi() {
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
@@ -401,15 +412,15 @@ public class MainActivity extends Activity implements OtgAdbBridge.BridgeLogger,
         TextView tvTitle = new TextView(this);
         tvTitle.setText("ADBHUB-LINK");
         tvTitle.setTextColor(Color.WHITE);
-        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
-        tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp(17.5f));
+        tvTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
         brandCol.addView(tvTitle);
 
         TextView tvSub = new TextView(this);
         tvSub.setText("ESTACIÓN CLIENTE ANDROID • CABLE USB-C OTG");
         tvSub.setTextColor(COLOR_BORDER_ACCENT);
-        tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-        tvSub.setTypeface(Typeface.DEFAULT_BOLD);
+        tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp(10f));
+        tvSub.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
         brandCol.addView(tvSub);
 
         header.addView(brandCol);
@@ -417,8 +428,8 @@ public class MainActivity extends Activity implements OtgAdbBridge.BridgeLogger,
         tvHeaderBadge = new TextView(this);
         tvHeaderBadge.setText("ESPERANDO CABLE OTG");
         tvHeaderBadge.setTextColor(COLOR_TEXT_SECONDARY);
-        tvHeaderBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-        tvHeaderBadge.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
+        tvHeaderBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp(10f));
+        tvHeaderBadge.setTypeface(Typeface.create("monospace", Typeface.BOLD));
         tvHeaderBadge.setPadding(dp(10), dp(5), dp(10), dp(5));
         tvHeaderBadge.setBackground(makeRoundedBox(COLOR_BG_RECESSED, COLOR_BORDER_SUBTLE, dp(6)));
         header.addView(tvHeaderBadge);
@@ -447,7 +458,8 @@ public class MainActivity extends Activity implements OtgAdbBridge.BridgeLogger,
         TextView tvCredHint = new TextView(this);
         tvCredHint.setText("Comparta este código con su técnico. Permite conexión desde cualquier parte del mundo sin VPN.");
         tvCredHint.setTextColor(COLOR_TEXT_SECONDARY);
-        tvCredHint.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvCredHint.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp(12f));
+        tvCredHint.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
         tvCredHint.setPadding(0, dp(2), 0, dp(10));
         cardCreds.addView(tvCredHint);
 
@@ -460,16 +472,19 @@ public class MainActivity extends Activity implements OtgAdbBridge.BridgeLogger,
         TextView tvCodeCaption = new TextView(this);
         tvCodeCaption.setText("CÓDIGO DE EMPAREJAMIENTO MUNDIAL");
         tvCodeCaption.setTextColor(COLOR_TEXT_MUTED);
-        tvCodeCaption.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-        tvCodeCaption.setTypeface(Typeface.DEFAULT_BOLD);
+        tvCodeCaption.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp(10.5f));
+        tvCodeCaption.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
         tvCodeCaption.setGravity(Gravity.CENTER);
         codeBox.addView(tvCodeCaption);
 
         tvCodeDisplay = new TextView(this);
         tvCodeDisplay.setText(currentCode);
         tvCodeDisplay.setTextColor(COLOR_BORDER_ACCENT);
-        tvCodeDisplay.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
-        tvCodeDisplay.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
+        tvCodeDisplay.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp(23f));
+        tvCodeDisplay.setTypeface(Typeface.create("monospace", Typeface.BOLD));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            tvCodeDisplay.setLetterSpacing(0.06f);
+        }
         tvCodeDisplay.setGravity(Gravity.CENTER);
         tvCodeDisplay.setPadding(0, dp(4), 0, dp(6));
         codeBox.addView(tvCodeDisplay);
@@ -477,16 +492,16 @@ public class MainActivity extends Activity implements OtgAdbBridge.BridgeLogger,
         tvRelayEndpoint = new TextView(this);
         tvRelayEndpoint.setText("Relay Mundial: Conectando a bore.pub...");
         tvRelayEndpoint.setTextColor(COLOR_STATUS_AMBER);
-        tvRelayEndpoint.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvRelayEndpoint.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
+        tvRelayEndpoint.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp(11.5f));
+        tvRelayEndpoint.setTypeface(Typeface.create("monospace", Typeface.BOLD));
         tvRelayEndpoint.setGravity(Gravity.CENTER);
         codeBox.addView(tvRelayEndpoint);
 
         tvLanEndpoint = new TextView(this);
         tvLanEndpoint.setText("LAN Wi-Fi: " + localIp + ":5555");
         tvLanEndpoint.setTextColor(COLOR_TEXT_SECONDARY);
-        tvLanEndpoint.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvLanEndpoint.setTypeface(Typeface.MONOSPACE);
+        tvLanEndpoint.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp(11.5f));
+        tvLanEndpoint.setTypeface(Typeface.create("monospace", Typeface.NORMAL));
         tvLanEndpoint.setGravity(Gravity.CENTER);
         tvLanEndpoint.setPadding(0, dp(2), 0, 0);
         codeBox.addView(tvLanEndpoint);
@@ -552,15 +567,16 @@ public class MainActivity extends Activity implements OtgAdbBridge.BridgeLogger,
         tvDeviceTitle = new TextView(this);
         tvDeviceTitle.setText("Escaneando puerto USB-C OTG...");
         tvDeviceTitle.setTextColor(Color.WHITE);
-        tvDeviceTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        tvDeviceTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        tvDeviceTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp(15f));
+        tvDeviceTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
         tvDeviceTitle.setPadding(0, dp(6), 0, dp(4));
         cardDevice.addView(tvDeviceTitle);
 
         tvDeviceSpecs = new TextView(this);
         tvDeviceSpecs.setText("Conecte el teléfono a reparar usando un cable USB-C a USB-C.");
         tvDeviceSpecs.setTextColor(COLOR_TEXT_SECONDARY);
-        tvDeviceSpecs.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvDeviceSpecs.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp(12f));
+        tvDeviceSpecs.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
         tvDeviceSpecs.setPadding(0, 0, 0, dp(10));
         cardDevice.addView(tvDeviceSpecs);
 
@@ -599,8 +615,11 @@ public class MainActivity extends Activity implements OtgAdbBridge.BridgeLogger,
                 "4. En el teléfono a reparar: active 'Depuración por USB' y acepte la ventana de huella RSA cuando el técnico se conecte."
         );
         tvGuide.setTextColor(COLOR_TEXT_PRIMARY);
-        tvGuide.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvGuide.setLineSpacing(dp(3), 1.0f);
+        tvGuide.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp(12f));
+        tvGuide.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            tvGuide.setLineSpacing(dp(3), 1.15f);
+        }
         tvGuide.setPadding(0, dp(6), 0, 0);
         cardGuide.addView(tvGuide);
         content.addView(cardGuide);
@@ -611,8 +630,8 @@ public class MainActivity extends Activity implements OtgAdbBridge.BridgeLogger,
 
         tvLogsBox = new TextView(this);
         tvLogsBox.setTextColor(COLOR_TEXT_SECONDARY);
-        tvLogsBox.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvLogsBox.setTypeface(Typeface.MONOSPACE);
+        tvLogsBox.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp(10.5f));
+        tvLogsBox.setTypeface(Typeface.create("monospace", Typeface.NORMAL));
         tvLogsBox.setPadding(dp(10), dp(10), dp(10), dp(10));
         tvLogsBox.setBackground(makeRoundedBox(COLOR_BG_RECESSED, COLOR_BORDER_SUBTLE, dp(6)));
         LinearLayout.LayoutParams logLp = new LinearLayout.LayoutParams(
@@ -644,8 +663,8 @@ public class MainActivity extends Activity implements OtgAdbBridge.BridgeLogger,
         TextView tv = new TextView(this);
         tv.setText(text);
         tv.setTextColor(COLOR_BORDER_ACCENT);
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tv.setTypeface(Typeface.DEFAULT_BOLD);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp(11f));
+        tv.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
         return tv;
     }
 
@@ -653,8 +672,8 @@ public class MainActivity extends Activity implements OtgAdbBridge.BridgeLogger,
         TextView tv = new TextView(this);
         tv.setText(text);
         tv.setTextColor(COLOR_TEXT_SECONDARY);
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11.5f);
-        tv.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp(11.5f));
+        tv.setTypeface(Typeface.create("monospace", Typeface.BOLD));
         tv.setPadding(dp(10), dp(8), dp(10), dp(8));
         tv.setBackground(makeRoundedBox(COLOR_BG_RECESSED, COLOR_BORDER_SUBTLE, dp(6)));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
@@ -669,8 +688,8 @@ public class MainActivity extends Activity implements OtgAdbBridge.BridgeLogger,
         btn.setText(text);
         btn.setAllCaps(false);
         btn.setTextColor(Color.WHITE);
-        btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12.5f);
-        btn.setTypeface(Typeface.DEFAULT_BOLD);
+        btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp(12.5f));
+        btn.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
         btn.setPadding(dp(12), dp(10), dp(12), dp(10));
         btn.setBackground(makeRoundedBox(fillColor, strokeColor, dp(7)));
         return btn;

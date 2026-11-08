@@ -425,12 +425,68 @@ def start_gui(code, local_ip):
     try:
         import tkinter as tk
         from tkinter import ttk
+        import tkinter.font as tkfont
 
         root = tk.Tk()
         root.title("ADBHUB-LINK — Estación del Cliente (Linux)")
-        root.geometry("820x540")
-        root.minsize(640, 420)
+        root.geometry("980x640")
+        root.minsize(680, 440)
         root.configure(bg="#090d16")
+
+        # Iniciar maximizado (sin pantalla completa invasiva, conservando barra de título estándar)
+        try:
+            root.state("zoomed")
+        except Exception:
+            try:
+                root.attributes("-zoomed", True)
+            except Exception:
+                pass
+
+        # Detección inteligente de la mejor tipografía instalada
+        available_fonts = set(tkfont.families(root))
+        prop_font = "DejaVu Sans"
+        for candidate in ["Inter", "Ubuntu", "Segoe UI", "Roboto", "DejaVu Sans", "Helvetica", "Arial"]:
+            if candidate in available_fonts:
+                prop_font = candidate
+                break
+
+        mono_font = "DejaVu Sans Mono"
+        for candidate in ["Cascadia Code", "JetBrains Mono", "Ubuntu Mono", "DejaVu Sans Mono", "Consolas", "Courier"]:
+            if candidate in available_fonts:
+                mono_font = candidate
+                break
+
+        # Tipografía responsiva autoadaptativa
+        f_title = tkfont.Font(family=prop_font, size=14, weight="bold")
+        f_hero_name = tkfont.Font(family=prop_font, size=13, weight="bold")
+        f_header = tkfont.Font(family=prop_font, size=10, weight="bold")
+        f_badge = tkfont.Font(family=prop_font, size=9, weight="bold")
+        f_body = tkfont.Font(family=prop_font, size=9)
+        f_body_bold = tkfont.Font(family=prop_font, size=9, weight="bold")
+        f_caption = tkfont.Font(family=prop_font, size=8)
+        f_caption_bold = tkfont.Font(family=prop_font, size=8, weight="bold")
+        f_code_hero = tkfont.Font(family=mono_font, size=15, weight="bold")
+        f_code_sub = tkfont.Font(family=mono_font, size=9, weight="bold")
+        f_mono_specs = tkfont.Font(family=mono_font, size=10)
+
+        def on_window_resize(event):
+            if event.widget != root:
+                return
+            w = max(640, event.width)
+            scale = max(0.90, min(1.30, w / 960.0))
+            f_title.configure(size=int(round(14 * scale)))
+            f_hero_name.configure(size=int(round(13 * scale)))
+            f_header.configure(size=int(round(10 * scale)))
+            f_badge.configure(size=int(round(9 * scale)))
+            f_body.configure(size=int(round(9 * scale)))
+            f_body_bold.configure(size=int(round(9 * scale)))
+            f_caption.configure(size=int(round(8 * scale)))
+            f_caption_bold.configure(size=int(round(8 * scale)))
+            f_code_hero.configure(size=int(round(15 * scale)))
+            f_code_sub.configure(size=int(round(9 * scale)))
+            f_mono_specs.configure(size=int(round(10 * scale)))
+
+        root.bind("<Configure>", on_window_resize)
 
         # Paleta Enterprise Dark Slate
         BG_CANVAS = "#090d16"
@@ -460,7 +516,7 @@ def start_gui(code, local_ip):
         tk.Label(
             title_frame,
             text="ADBHUB-LINK",
-            font=("DejaVu Sans", 14, "bold"),
+            font=f_title,
             fg="#ffffff",
             bg=BG_HEADER,
         ).pack(side="left")
@@ -468,7 +524,7 @@ def start_gui(code, local_ip):
         tk.Label(
             title_frame,
             text="  ESTACIÓN DEL CLIENTE LINUX  ",
-            font=("DejaVu Sans", 9, "bold"),
+            font=f_badge,
             fg="#38bdf8",
             bg="#0c2d48",
             padx=6,
@@ -479,7 +535,7 @@ def start_gui(code, local_ip):
         status_lbl = tk.Label(
             top_bar,
             textvariable=status_badge_var,
-            font=("DejaVu Sans", 10, "bold"),
+            font=f_header,
             fg=TEXT_SECONDARY,
             bg=BG_HEADER,
         )
@@ -494,7 +550,7 @@ def start_gui(code, local_ip):
         tk.Label(
             footer,
             text=f"ADBHUB-LINK v2.0 • Host: {hostname} • Puerto Puente: {local_ip}:5555",
-            font=("DejaVu Sans", 9),
+            font=f_body,
             fg=TEXT_MUTED,
             bg=BG_HEADER,
         ).pack(side="left")
@@ -503,7 +559,7 @@ def start_gui(code, local_ip):
         tk.Label(
             footer,
             textvariable=toast_var,
-            font=("DejaVu Sans", 9, "bold"),
+            font=f_body_bold,
             fg="#38bdf8",
             bg=BG_HEADER,
         ).pack(side="right")
@@ -546,7 +602,7 @@ def start_gui(code, local_ip):
         tk.Label(
             cred_card,
             text="CREDENCIALES DE ESTA ESTACIÓN",
-            font=("DejaVu Sans", 9, "bold"),
+            font=f_header,
             fg=TEXT_SECONDARY,
             bg=BG_CARD,
         ).pack(anchor="w")
@@ -554,7 +610,7 @@ def start_gui(code, local_ip):
         tk.Label(
             cred_card,
             text="Comparta esta dirección IP o código con el técnico.",
-            font=("DejaVu Sans", 9),
+            font=f_body,
             fg=TEXT_MUTED,
             bg=BG_CARD,
         ).pack(anchor="w", pady=(2, 8))
@@ -568,7 +624,7 @@ def start_gui(code, local_ip):
         tk.Label(
             ip_box,
             text="CÓDIGO DE ESTACIÓN (COMPATIBLE CON VPN / INTERNET)",
-            font=("DejaVu Sans", 8, "bold"),
+            font=f_caption_bold,
             fg=TEXT_MUTED,
             bg=BG_RECESSED,
         ).pack()
@@ -576,7 +632,7 @@ def start_gui(code, local_ip):
         tk.Label(
             ip_box,
             textvariable=code_var,
-            font=("DejaVu Sans Mono", 15, "bold"),
+            font=f_code_hero,
             fg="#38bdf8",
             bg=BG_RECESSED,
         ).pack(pady=3)
@@ -586,7 +642,7 @@ def start_gui(code, local_ip):
         tk.Label(
             ip_box,
             textvariable=relay_var,
-            font=("DejaVu Sans Mono", 9, "bold"),
+            font=f_code_sub,
             fg=STATUS_GREEN,
             bg=BG_RECESSED,
         ).pack()
@@ -609,7 +665,7 @@ def start_gui(code, local_ip):
             fg="white",
             activebackground=ACCENT_BLUE,
             activeforeground="white",
-            font=("DejaVu Sans", 10, "bold"),
+            font=f_header,
             relief="flat",
             pady=6,
             cursor="hand2",
@@ -623,7 +679,7 @@ def start_gui(code, local_ip):
             fg=TEXT_PRIMARY,
             activebackground=ACCENT_BLUE_DARK,
             activeforeground="white",
-            font=("DejaVu Sans", 9, "bold"),
+            font=f_body_bold,
             relief="flat",
             pady=4,
             cursor="hand2",
@@ -638,7 +694,7 @@ def start_gui(code, local_ip):
         tk.Label(
             chk_card,
             text="LISTA DE VERIFICACIÓN USB",
-            font=("DejaVu Sans", 9, "bold"),
+            font=f_body_bold,
             fg=TEXT_SECONDARY,
             bg=BG_CARD,
         ).pack(anchor="w", pady=(0, 6))
@@ -651,7 +707,7 @@ def start_gui(code, local_ip):
             tk.Label(
                 chk_card,
                 textvariable=svar,
-                font=("DejaVu Sans Mono", 9, "bold"),
+                font=f_code_sub,
                 fg=TEXT_PRIMARY,
                 bg=BG_RECESSED,
                 padx=8,
@@ -671,7 +727,7 @@ def start_gui(code, local_ip):
         tk.Label(
             dev_card,
             text="DISPOSITIVO USB CONECTADO A ESTA ESTACIÓN",
-            font=("DejaVu Sans", 9, "bold"),
+            font=f_body_bold,
             fg=TEXT_SECONDARY,
             bg=BG_CARD,
         ).pack(anchor="w")
@@ -680,7 +736,7 @@ def start_gui(code, local_ip):
         dev_name_lbl = tk.Label(
             dev_card,
             textvariable=dev_name_var,
-            font=("DejaVu Sans", 14, "bold"),
+            font=f_hero_name,
             fg="#ffffff",
             bg=BG_CARD,
         )
@@ -690,7 +746,7 @@ def start_gui(code, local_ip):
         tk.Label(
             dev_card,
             textvariable=dev_specs_var,
-            font=("DejaVu Sans Mono", 10),
+            font=f_mono_specs,
             fg=TEXT_SECONDARY,
             bg=BG_CARD,
         ).pack(anchor="w", pady=(0, 8))
@@ -707,7 +763,7 @@ def start_gui(code, local_ip):
             fg="#38bdf8",
             activebackground=ACCENT_BLUE_DARK,
             activeforeground="white",
-            font=("DejaVu Sans", 9, "bold"),
+            font=f_body_bold,
             relief="flat",
             padx=10,
             pady=5,
@@ -723,7 +779,7 @@ def start_gui(code, local_ip):
         tk.Label(
             guide_card,
             text="TUTORIAL: CONEXIÓN REMOTA CON EL TÉCNICO",
-            font=("DejaVu Sans", 10, "bold"),
+            font=f_header,
             fg="#38bdf8",
             bg=BG_CARD,
         ).pack(anchor="w", pady=(0, 6))
@@ -738,7 +794,7 @@ def start_gui(code, local_ip):
         tk.Label(
             guide_card,
             text=guide_text,
-            font=("DejaVu Sans", 9),
+            font=f_body,
             fg=TEXT_PRIMARY,
             bg=BG_CARD,
             justify="left",

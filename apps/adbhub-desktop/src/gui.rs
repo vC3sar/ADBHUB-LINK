@@ -162,8 +162,13 @@ impl DesktopGuiApp {
 
         let prop_candidates = [
             "C:\\Windows\\Fonts\\segoeui.ttf",
+            "C:\\Windows\\Fonts\\segoeuib.ttf",
+            "C:\\Windows\\Fonts\\calibri.ttf",
+            "C:\\Windows\\Fonts\\arial.ttf",
+            "/usr/share/fonts/truetype/inter/Inter-Regular.ttf",
             "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",
             "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+            "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
         ];
         for path in prop_candidates {
             if let Ok(bytes) = std::fs::read(path) {
@@ -178,9 +183,14 @@ impl DesktopGuiApp {
         }
 
         let mono_candidates = [
+            "C:\\Windows\\Fonts\\CascadiaCode.ttf",
+            "C:\\Windows\\Fonts\\CascadiaMono.ttf",
             "C:\\Windows\\Fonts\\consola.ttf",
+            "/usr/share/fonts/truetype/jetbrains-mono/JetBrainsMono-Regular.ttf",
+            "/usr/share/fonts/truetype/cascadia-code/CascadiaCode.ttf",
             "/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf",
             "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+            "/usr/share/fonts/truetype/freefont/FreeMono.ttf",
         ];
         for path in mono_candidates {
             if let Ok(bytes) = std::fs::read(path) {
@@ -1786,6 +1796,18 @@ impl DesktopGuiApp {
 
 impl eframe::App for DesktopGuiApp {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+        // Escala responsiva autoadaptativa según resolución de ventana/pantalla
+        let ctx = ui.ctx().clone();
+        let current_zoom = ctx.zoom_factor();
+        let viewport_width = ctx
+            .input(|i| i.viewport().inner_rect.map(|r| r.width()))
+            .unwrap_or(1280.0);
+        let physical_width = viewport_width * current_zoom;
+        let target_zoom = (physical_width / 1366.0).clamp(0.90, 1.30);
+        if (target_zoom - current_zoom).abs() > 0.04 {
+            ctx.set_zoom_factor(target_zoom);
+        }
+
         while let Ok(event) = self.event_rx.try_recv() {
             match event {
                 GuiAsyncEvent::Log(tag, msg) => {
@@ -2010,8 +2032,9 @@ pub fn run_desktop_native_gui(
 ) -> Result<(), eframe::Error> {
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-            .with_inner_size([920.0, 600.0])
-            .with_min_inner_size([680.0, 460.0])
+            .with_inner_size([1180.0, 720.0])
+            .with_min_inner_size([720.0, 480.0])
+            .with_maximized(true)
             .with_title("ADBHUB-LINK — Estación del Técnico"),
         ..Default::default()
     };
