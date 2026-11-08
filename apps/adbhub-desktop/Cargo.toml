@@ -33,6 +33,7 @@ adbhub-usbip-client-adapter.workspace = true
 axum.workspace = true
 chrono.workspace = true
 eframe = "0.37.0"
+qrcode = "0.14.1"
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

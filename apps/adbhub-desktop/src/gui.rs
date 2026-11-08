@@ -40,12 +40,16 @@ const STATUS_AMBER: Color32 = Color32::from_rgb(245, 158, 11); // #F59E0B
 const STATUS_RED: Color32 = Color32::from_rgb(239, 68, 68); // #EF4444
 const STATUS_RED_BG: Color32 = Color32::from_rgb(69, 15, 20);
 
+pub const APK_MEDIAFIRE_URL: &str =
+    "https://www.mediafire.com/file/5vh10fh39e0vcwi/adbhub-client.apk/file";
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum TechNavTab {
     Dashboard,
     TerminalPro,
     ServerDevices,
     DiagnosticsGuide,
+    ApkQr,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -108,6 +112,7 @@ pub struct DesktopGuiApp {
     event_tx: Sender<GuiAsyncEvent>,
     event_rx: Receiver<GuiAsyncEvent>,
     is_command_running: bool,
+    qr_texture: Option<egui::TextureHandle>,
 }
 
 impl DesktopGuiApp {
@@ -117,6 +122,7 @@ impl DesktopGuiApp {
         controller: Arc<DesktopController>,
     ) -> Self {
         Self::configure_fonts_and_theme(&cc.egui_ctx);
+        let qr_tex = Self::generate_qr_texture(&cc.egui_ctx, APK_MEDIAFIRE_URL);
 
         let (tx, rx) = channel();
 
@@ -151,10 +157,35 @@ impl DesktopGuiApp {
             event_tx: tx,
             event_rx: rx,
             is_command_running: false,
+            qr_texture: qr_tex,
         };
 
         app.trigger_server_devices_poll();
         app
+    }
+
+    fn generate_qr_texture(ctx: &egui::Context, url: &str) -> Option<egui::TextureHandle> {
+        use qrcode::{Color, EcLevel, QrCode};
+        let qr = QrCode::with_error_correction_level(url.as_bytes(), EcLevel::M)
+            .or_else(|_| QrCode::new(url.as_bytes()))
+            .ok()?;
+        let qr_width = qr.width();
+        let border = 3;
+        let total_width = qr_width + border * 2;
+        let mut pixels = vec![Color32::WHITE; total_width * total_width];
+
+        for y in 0..qr_width {
+            for x in 0..qr_width {
+                if qr[(x, y)] == Color::Dark {
+                    let px = x + border;
+                    let py = y + border;
+                    pixels[py * total_width + px] = Color32::BLACK;
+                }
+            }
+        }
+
+        let color_image = egui::ColorImage::new([total_width, total_width], pixels);
+        Some(ctx.load_texture("qr_mediafire_apk", color_image, egui::TextureOptions::NEAREST))
     }
 
     fn configure_fonts_and_theme(ctx: &egui::Context) {
@@ -654,6 +685,47 @@ impl DesktopGuiApp {
                     "04  Guía & Laboratorio",
                     "UnlockTool / Chimera / SamFirm",
                 );
+                ui.add_space(4.0);
+                Self::sidebar_nav_btn(
+                    ui,
+                    &mut self.active_nav,
+                    TechNavTab::ApkQr,
+                    "05  Compartir APK (QR)",
+                    "MediaFire • Enlace al Cliente",
+                );
+
+                ui.add_space(8.0);
+                Frame::new()
+                    .fill(BG_CARD)
+                    .stroke(Stroke::new(1.0, Color32::from_rgb(14, 165, 233)))
+                    .corner_radius(CornerRadius::same(6))
+                    .inner_margin(Margin::same(8))
+                    .show(ui, |ui| {
+                        ui.set_width(ui.available_width());
+                        ui.horizontal(|ui| {
+                            if let Some(tex) = &self.qr_texture {
+                                ui.image((tex.id(), Vec2::new(38.0, 38.0)));
+                            }
+                            ui.vertical(|ui| {
+                                ui.label(
+                                    RichText::new("QR APK CLIENTE")
+                                        .size(9.5)
+                                        .strong()
+                                        .color(Color32::WHITE),
+                                );
+                                if ui
+                                    .button(
+                                        RichText::new("Ver QR / Compartir")
+                                            .size(9.0)
+                                            .color(BORDER_ACCENT),
+                                    )
+                                    .clicked()
+                                {
+                                    self.active_nav = TechNavTab::ApkQr;
+                                }
+                            });
+                        });
+                    });
 
                 ui.add_space(12.0);
                 Frame::new()
@@ -1792,6 +1864,191 @@ impl DesktopGuiApp {
                 }
             });
     }
+
+    fn render_apk_qr_tab(&mut self, ui: &mut egui::Ui) {
+        Frame::new()
+            .fill(BG_CARD)
+            .stroke(Stroke::new(1.0, BORDER_SUBTLE))
+            .corner_radius(CornerRadius::same(8))
+            .inner_margin(Margin::same(16))
+            .show(ui, |ui| {
+                ui.set_width(ui.available_width());
+                ui.label(
+                    RichText::new("DESCARGA DE APK CLIENTE — CÓDIGO QR Y ENLACE DIRECTO")
+                        .size(13.0)
+                        .strong()
+                        .color(BORDER_ACCENT),
+                );
+                ui.label(
+                    RichText::new(
+                        "Comparta este código QR o enlace con el cliente remoto para que instale 'adbhub-client.apk' en su teléfono Android OTG.",
+                    )
+                    .size(10.5)
+                    .color(TEXT_MUTED),
+                );
+
+                ui.add_space(14.0);
+
+                ui.horizontal_top(|ui| {
+                    // Columna Izquierda: QR Grande de alto contraste
+                    Frame::new()
+                        .fill(Color32::WHITE)
+                        .stroke(Stroke::new(2.0, BORDER_ACCENT))
+                        .corner_radius(CornerRadius::same(10))
+                        .inner_margin(Margin::same(14))
+                        .show(ui, |ui| {
+                            ui.vertical_centered(|ui| {
+                                if let Some(tex) = &self.qr_texture {
+                                    ui.image((tex.id(), Vec2::new(210.0, 210.0)));
+                                } else {
+                                    ui.label(
+                                        RichText::new("Generando código QR...")
+                                            .size(11.0)
+                                            .color(Color32::BLACK),
+                                    );
+                                }
+                                ui.add_space(6.0);
+                                ui.label(
+                                    RichText::new("Escanear con Cámara o App QR")
+                                        .size(10.5)
+                                        .strong()
+                                        .color(Color32::from_rgb(15, 23, 42)),
+                                );
+                            });
+                        });
+
+                    ui.add_space(16.0);
+
+                    // Columna Derecha: Enlace MediaFire, botones y pasos
+                    ui.vertical(|ui| {
+                        ui.label(
+                            RichText::new("ENLACE DIRECTO DE DESCARGA (MEDIAFIRE):")
+                                .size(10.0)
+                                .strong()
+                                .color(TEXT_SECONDARY),
+                        );
+                        ui.add_space(4.0);
+
+                        Frame::new()
+                            .fill(BG_RECESSED)
+                            .stroke(Stroke::new(1.0, Color32::from_rgb(38, 56, 84)))
+                            .corner_radius(CornerRadius::same(6))
+                            .inner_margin(Margin::same(10))
+                            .show(ui, |ui| {
+                                ui.set_width(ui.available_width());
+                                ui.horizontal(|ui| {
+                                    ui.label(
+                                        RichText::new(APK_MEDIAFIRE_URL)
+                                            .size(10.5)
+                                            .color(Color32::from_rgb(56, 189, 248))
+                                            .monospace(),
+                                    );
+                                });
+                            });
+
+                        ui.add_space(8.0);
+
+                        ui.horizontal(|ui| {
+                            if ui
+                                .button(
+                                    RichText::new("Copiar Enlace al Portapapeles")
+                                        .size(11.0)
+                                        .strong()
+                                        .color(Color32::WHITE),
+                                )
+                                .clicked()
+                            {
+                                ui.ctx().copy_text(APK_MEDIAFIRE_URL.to_string());
+                                self.terminal_logs.push((
+                                    "COMPARTIR".to_string(),
+                                    "Enlace de descarga de MediaFire copiado al portapapeles."
+                                        .to_string(),
+                                ));
+                                self.last_action_message = Some((
+                                    Instant::now(),
+                                    "Enlace MediaFire copiado al portapapeles con éxito.".to_string(),
+                                ));
+                            }
+
+                            if ui
+                                .button(
+                                    RichText::new("Abrir en Navegador")
+                                        .size(11.0)
+                                        .color(BORDER_ACCENT),
+                                )
+                                .clicked()
+                            {
+                                #[cfg(target_os = "windows")]
+                                {
+                                    let _ = std::process::Command::new("cmd")
+                                        .args(["/c", "start", "", APK_MEDIAFIRE_URL])
+                                        .spawn();
+                                }
+                                #[cfg(not(target_os = "windows"))]
+                                {
+                                    let _ = std::process::Command::new("xdg-open")
+                                        .arg(APK_MEDIAFIRE_URL)
+                                        .spawn();
+                                }
+                            }
+                        });
+
+                        ui.add_space(14.0);
+
+                        // Tarjeta de Instrucciones para el Cliente
+                        Frame::new()
+                            .fill(BG_RECESSED)
+                            .stroke(Stroke::new(1.0, BORDER_SUBTLE))
+                            .corner_radius(CornerRadius::same(6))
+                            .inner_margin(Margin::same(12))
+                            .show(ui, |ui| {
+                                ui.set_width(ui.available_width());
+                                ui.label(
+                                    RichText::new("INSTRUCCIONES RÁPIDAS PARA EL CLIENTE:")
+                                        .size(10.0)
+                                        .strong()
+                                        .color(Color32::WHITE),
+                                );
+                                ui.add_space(6.0);
+
+                                for (num, text) in [
+                                    (
+                                        "1",
+                                        "Apuntar la cámara del teléfono al código QR de la izquierda o abrir el enlace enviado.",
+                                    ),
+                                    (
+                                        "2",
+                                        "Tocar el botón azul 'Download' en MediaFire para descargar 'adbhub-client.apk'.",
+                                    ),
+                                    (
+                                        "3",
+                                        "Instalar la app (si Android avisa sobre origen desconocido, seleccionar 'Permitir desde esta fuente').",
+                                    ),
+                                    (
+                                        "4",
+                                        "Abrir ADBHUB-LINK, conectar el cable USB-C a USB-C hacia el teléfono a reparar y pulsar 'COPIAR CÓDIGO DE ESTACIÓN'.",
+                                    ),
+                                ] {
+                                    ui.horizontal_top(|ui| {
+                                        ui.label(
+                                            RichText::new(format!("[{num}]"))
+                                                .size(10.0)
+                                                .strong()
+                                                .color(BORDER_ACCENT),
+                                        );
+                                        ui.label(
+                                            RichText::new(text)
+                                                .size(10.0)
+                                                .color(TEXT_SECONDARY),
+                                        );
+                                    });
+                                    ui.add_space(3.0);
+                                }
+                            });
+                    });
+                });
+            });
+    }
 }
 
 impl eframe::App for DesktopGuiApp {
@@ -1958,6 +2215,9 @@ impl eframe::App for DesktopGuiApp {
                         }
                         TechNavTab::DiagnosticsGuide => {
                             self.render_diagnostics_guide_tab(ui);
+                        }
+                        TechNavTab::ApkQr => {
+                            self.render_apk_qr_tab(ui);
                         }
                     });
             });

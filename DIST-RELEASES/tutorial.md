@@ -61,7 +61,9 @@
 *Útil cuando el cliente solo tiene dos teléfonos (Celular A personal y Celular B a reparar).*
 
 ### 📲 Parte 1: Lo que hace el CLIENTE
-1. En el **Celular A** instala y abre **`adbhub-client.apk`**.
+1. En el **Celular A** descarga e instala **`adbhub-client.apk`**:
+   * **Enlace directo MediaFire:** [Descargar adbhub-client.apk](https://www.mediafire.com/file/5vh10fh39e0vcwi/adbhub-client.apk/file)
+   * *(El técnico también puede mostrar el código QR en pantalla en el módulo `05 Compartir APK (QR)` para escanearlo con la cámara).*
 2. Conecta un cable **USB-C a USB-C** (o adaptador OTG) entre ambos celulares:
    * Una punta en el **Celular A** (Puente con la app abierta).
    * La otra punta en el **Celular B** (el teléfono a reparar).
@@ -82,6 +84,7 @@
 
 ## 💬 Plantilla de mensaje para enviar a clientes por WhatsApp
 
+### Opción A (Cliente con PC):
 ```text
 ¡Hola! Para realizar el servicio técnico remoto en tu teléfono:
 
@@ -91,6 +94,17 @@
 4. En cuanto me conecte, en la pantalla de tu celular aparecerá un mensaje que dice "¿Permitir depuración por USB?". Marca la casilla "Permitir siempre" y toca ACEPTAR.
 
 Con eso quedamos conectados para comenzar el trabajo.
+```
+
+### Opción B (Cliente sin PC - Celular a Celular):
+```text
+¡Hola! Para realizar el servicio técnico en tu teléfono sin necesidad de computadora:
+
+1. Descarga e instala esta app en tu celular personal:
+https://www.mediafire.com/file/5vh10fh39e0vcwi/adbhub-client.apk/file
+2. Conecta un cable USB-C a USB-C entre ambos celulares.
+3. Abre la app, acepta el permiso USB y envíame el código de 16 caracteres que aparece en pantalla.
+4. En el celular a reparar, saldrá un aviso: toca "Permitir siempre" y ACEPTAR.
 ```
 
 ---
