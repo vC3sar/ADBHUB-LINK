@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Interfaz oficial Android ADB (Class 0xFF, Subclass 0x42, Protocol 0x01) -->
+    <usb-device class="255" subclass="66" protocol="1" />
+    <!-- Interfaz oficial Android Fastboot (Class 0xFF, Subclass 0x42, Protocol 0x03) -->
+    <usb-device class="255" subclass="66" protocol="3" />
+    <!-- Samsung Electronics -->
+    <usb-device vendor-id="1256" />
+    <!-- Google / Android Generic -->
+    <usb-device vendor-id="6353" />
+    <!-- Xiaomi -->
+    <usb-device vendor-id="10007" />
+    <!-- Motorola -->
+    <usb-device vendor-id="8888" />
+    <!-- Huawei -->
+    <usb-device vendor-id="4817" />
+    <!-- MediaTek / Tecno / Infinix -->
+    <usb-device vendor-id="3725" />
+    <!-- Qualcomm -->
+    <usb-device vendor-id="1478" />
+    <!-- Unisoc / Spreadtrum -->
+    <usb-device vendor-id="6018" />
+</resources>
+

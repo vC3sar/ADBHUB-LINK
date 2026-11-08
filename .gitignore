@@ -26,3 +26,9 @@ Thumbs.db
 *.bak
 *.tmp
 
+# Android build artifacts
+apps/adbhub-android/build/
+apps/adbhub-android/*.jks
+apps/adbhub-android/*.keystore
+
+

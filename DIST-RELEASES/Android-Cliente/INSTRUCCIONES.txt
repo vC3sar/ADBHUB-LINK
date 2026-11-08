@@ -1,0 +1,33 @@
+========================================================================
+  ADBHUB-LINK — ESTACIÓN DEL CLIENTE PARA ANDROID (CABLE USB-C OTG)
+========================================================================
+
+CONTENIDO DE ESTA CARPETA:
+- adbhub-client.apk : Aplicación nativa para Android 7.0+ (sin necesidad de Root).
+
+¿PARA QUÉ SIRVE?
+Permite que cualquier cliente que NO tenga computadora use un segundo teléfono
+Android y un cable USB-C a USB-C (o adaptador OTG) como puente hacia la
+Estación del Técnico (adbhub-desktop.exe) en cualquier parte del mundo.
+
+------------------------------------------------------------------------
+PASOS DE USO PARA EL CLIENTE:
+------------------------------------------------------------------------
+1. Instale "adbhub-client.apk" en el Teléfono A (el teléfono que tiene Internet
+   por Wi-Fi o Datos Móviles 4G/5G y servirá de puente).
+2. En el Teléfono B (el teléfono a reparar):
+   - Vaya a Ajustes > Acerca del teléfono > Toque 7 veces "Número de compilación".
+   - En Opciones para desarrolladores, active "Depuración por USB".
+3. Conecte el cable USB-C a USB-C entre el Teléfono A y el Teléfono B.
+4. En el Teléfono A (donde abrió ADBHUB-LINK OTG):
+   - Acepte la ventana "¿Permitir que ADBHUB-LINK OTG acceda al dispositivo USB?".
+   - NOTA: Si al conectar el cable el Teléfono A no detecta al Teléfono B,
+     baje la barra de notificaciones del Teléfono A, toque la notificación de
+     "Sistema Android • USB" y seleccione "Controlado por: Este dispositivo".
+5. Copie el CÓDIGO DE ESTACIÓN de 16 caracteres (ej. 8924-XXXX-XXXX-XXXX) que
+   aparece en la pantalla de la app y envíeselo a su técnico.
+6. Cuando el técnico se conecte desde su PC, aparecerá en la pantalla del
+   Teléfono B el aviso "¿Permitir depuración por USB?". Marque "Permitir siempre"
+   y toque ACEPTAR.
+========================================================================
+
