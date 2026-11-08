@@ -469,11 +469,16 @@ def start_gui(code, local_ip):
         f_code_sub = tkfont.Font(family=mono_font, size=9, weight="bold")
         f_mono_specs = tkfont.Font(family=mono_font, size=10)
 
+        _last_scale = [1.0]
+
         def on_window_resize(event):
             if event.widget != root:
                 return
             w = max(640, event.width)
-            scale = max(0.90, min(1.30, w / 960.0))
+            scale = round(max(0.90, min(1.30, w / 960.0)), 2)
+            if abs(scale - _last_scale[0]) < 0.06:
+                return
+            _last_scale[0] = scale
             f_title.configure(size=int(round(14 * scale)))
             f_hero_name.configure(size=int(round(13 * scale)))
             f_header.configure(size=int(round(10 * scale)))
