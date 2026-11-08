@@ -75,8 +75,8 @@ pub const RADIUS_MEDIUM: u8 = 6;
 pub const RADIUS_LARGE: u8 = 8;
 pub const RADIUS_FULL: u8 = 99;
 
-pub const APK_MEDIAFIRE_URL: &str =
-    "https://www.mediafire.com/file/5vh10fh39e0vcwi/adbhub-client.apk/file";
+pub const APK_RELEASE_URL: &str =
+    "https://github.com/vC3sar/ADBHUB-LINK/releases/latest/download/adbhub-client.apk";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum TechNavTab {
@@ -157,7 +157,7 @@ impl DesktopGuiApp {
         controller: Arc<DesktopController>,
     ) -> Self {
         Self::configure_fonts_and_theme(&cc.egui_ctx);
-        let qr_tex = Self::generate_qr_texture(&cc.egui_ctx, APK_MEDIAFIRE_URL);
+        let qr_tex = Self::generate_qr_texture(&cc.egui_ctx, APK_RELEASE_URL);
 
         let (tx, rx) = channel();
 
@@ -220,7 +220,7 @@ impl DesktopGuiApp {
         }
 
         let color_image = egui::ColorImage::new([total_width, total_width], pixels);
-        Some(ctx.load_texture("qr_mediafire_apk", color_image, egui::TextureOptions::NEAREST))
+        Some(ctx.load_texture("qr_github_apk", color_image, egui::TextureOptions::NEAREST))
     }
 
     fn configure_fonts_and_theme(ctx: &egui::Context) {
@@ -729,7 +729,7 @@ impl DesktopGuiApp {
                     &mut self.active_nav,
                     TechNavTab::ApkQr,
                     "05  Compartir APK (QR)",
-                    "MediaFire • Enlace al Cliente",
+                    "GitHub Release • Enlace Directo",
                 );
 
                 ui.add_space(SPACE_2);
@@ -1929,7 +1929,7 @@ impl DesktopGuiApp {
             .show(ui, |ui| {
                 ui.set_width(ui.available_width());
                 ui.label(
-                    RichText::new("DESCARGA DE APK CLIENTE — CÓDIGO QR Y ENLACE DIRECTO")
+                    RichText::new("DESCARGA DE APK CLIENTE — CÓDIGO QR Y GITHUB RELEASE")
                         .size(TYPO_SECTION_TITLE)
                         .strong()
                         .color(BORDER_ACCENT),
@@ -1937,7 +1937,7 @@ impl DesktopGuiApp {
                 ui.add_space(2.0);
                 ui.label(
                     RichText::new(
-                        "Comparta este código QR o enlace con el cliente remoto para que instale 'adbhub-client.apk' en su teléfono Android OTG.",
+                        "Comparta este código QR o enlace con el cliente remoto para que instale 'adbhub-client.apk' en su teléfono Android OTG directamente desde GitHub Releases.",
                     )
                     .size(TYPO_BODY)
                     .color(TEXT_MUTED),
@@ -1975,10 +1975,10 @@ impl DesktopGuiApp {
 
                     ui.add_space(SPACE_4);
 
-                    // Columna Derecha: Enlace MediaFire, botones y pasos
+                    // Columna Derecha: Enlace GitHub Release, botones y pasos
                     ui.vertical(|ui| {
                         ui.label(
-                            RichText::new("ENLACE DIRECTO DE DESCARGA (MEDIAFIRE):")
+                            RichText::new("ENLACE DIRECTO DE DESCARGA OFICIAL (GITHUB RELEASE):")
                                 .size(TYPO_LABEL)
                                 .strong()
                                 .color(TEXT_SECONDARY),
@@ -1994,7 +1994,7 @@ impl DesktopGuiApp {
                                 ui.set_width(ui.available_width());
                                 ui.horizontal(|ui| {
                                     ui.label(
-                                        RichText::new(APK_MEDIAFIRE_URL)
+                                        RichText::new(APK_RELEASE_URL)
                                             .size(TYPO_BODY)
                                             .color(Color32::from_rgb(56, 189, 248))
                                             .monospace(),
@@ -2007,22 +2007,22 @@ impl DesktopGuiApp {
                         ui.horizontal(|ui| {
                             if ui
                                 .button(
-                                    RichText::new("Copiar Enlace al Portapapeles")
+                                    RichText::new("Copiar Enlace Directo al Portapapeles")
                                         .size(TYPO_BUTTON)
                                         .strong()
                                         .color(Color32::WHITE),
                                 )
                                 .clicked()
                             {
-                                ui.ctx().copy_text(APK_MEDIAFIRE_URL.to_string());
+                                ui.ctx().copy_text(APK_RELEASE_URL.to_string());
                                 self.terminal_logs.push((
                                     "COMPARTIR".to_string(),
-                                    "Enlace de descarga de MediaFire copiado al portapapeles."
+                                    "Enlace de descarga oficial de GitHub Release copiado al portapapeles."
                                         .to_string(),
                                 ));
                                 self.last_action_message = Some((
                                     Instant::now(),
-                                    "Enlace MediaFire copiado al portapapeles con éxito.".to_string(),
+                                    "Enlace oficial copiado al portapapeles con éxito.".to_string(),
                                 ));
                             }
 
@@ -2037,13 +2037,13 @@ impl DesktopGuiApp {
                                 #[cfg(target_os = "windows")]
                                 {
                                     let _ = std::process::Command::new("cmd")
-                                        .args(["/c", "start", "", APK_MEDIAFIRE_URL])
+                                        .args(["/c", "start", "", APK_RELEASE_URL])
                                         .spawn();
                                 }
                                 #[cfg(not(target_os = "windows"))]
                                 {
                                     let _ = std::process::Command::new("xdg-open")
-                                        .arg(APK_MEDIAFIRE_URL)
+                                        .arg(APK_RELEASE_URL)
                                         .spawn();
                                 }
                             }
@@ -2074,7 +2074,7 @@ impl DesktopGuiApp {
                                     ),
                                     (
                                         "2",
-                                        "Tocar el botón azul 'Download' en MediaFire para descargar 'adbhub-client.apk'.",
+                                        "La descarga de 'adbhub-client.apk' comenzará automáticamente desde GitHub Releases oficial (sin publicidad ni esperas).",
                                     ),
                                     (
                                         "3",
