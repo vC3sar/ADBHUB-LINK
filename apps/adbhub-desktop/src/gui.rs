@@ -722,109 +722,290 @@ impl DesktopGuiApp {
         do_disconnect: &mut Option<String>,
     ) {
         let is_connecting = matches!(self.state, TechConnectionState::Connecting);
+        let is_connected = matches!(self.state, TechConnectionState::Connected { .. });
+
+        // Contenedor principal con estilo Hero / Command Center
+        let card_border = if is_connected {
+            STATUS_GREEN
+        } else if is_connecting {
+            STATUS_AMBER
+        } else {
+            BORDER_SUBTLE
+        };
 
         Frame::new()
             .fill(BG_CARD)
-            .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-            .corner_radius(CornerRadius::same(8))
-            .inner_margin(Margin::symmetric(12, 10))
+            .stroke(Stroke::new(1.0, card_border))
+            .corner_radius(CornerRadius::same(10))
+            .inner_margin(Margin::same(12))
             .show(ui, |ui| {
                 ui.set_width(ui.available_width());
-                ui.horizontal_wrapped(|ui| {
+
+                // Fila Superior: Título descriptivo + Badge de estado
+                ui.horizontal(|ui| {
                     ui.label(
-                        RichText::new("DESTINO (IP:5555 O ID):")
+                        RichText::new("VINCULACIÓN REMOTA CON EL CLIENTE")
                             .size(10.5)
                             .strong()
-                            .color(TEXT_SECONDARY),
+                            .color(TEXT_MUTED),
                     );
 
-                    let input_w = (ui.available_width() - 260.0).clamp(160.0, 320.0);
-                    let edit = ui.add_sized(
-                        [input_w, 28.0],
-                        egui::TextEdit::singleline(&mut self.input_code)
-                            .hint_text("Ej. 192.168.1.83:5555 o Código")
-                            .font(egui::TextStyle::Monospace),
-                    );
-
-                    if is_connecting {
-                        ui.add(egui::Spinner::new());
-                        if ui
-                            .button(RichText::new("Cancelar").size(11.0).color(STATUS_RED))
-                            .clicked()
-                        {
-                            *do_cancel = true;
+                    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                        if let TechConnectionState::Connected { device } = &self.state {
+                            Self::pill_badge(
+                                ui,
+                                &format!("CONECTADO: {}", device.serial),
+                                STATUS_GREEN,
+                                STATUS_GREEN_BG,
+                            );
+                        } else if is_connecting {
+                            Self::pill_badge(
+                                ui,
+                                "RESOLVIENDO TÚNEL...",
+                                STATUS_AMBER,
+                                Color32::from_rgb(60, 40, 10),
+                            );
+                        } else {
+                            Self::pill_badge(
+                                ui,
+                                "LISTO PARA CONEXIÓN",
+                                ACCENT_BLUE,
+                                Color32::from_rgb(10, 30, 55),
+                            );
                         }
-                    } else {
-                        let connect_btn = ui.add(
-                            egui::Button::new(
-                                RichText::new("CONECTAR EQUIPO")
-                                    .size(11.5)
-                                    .strong()
-                                    .color(Color32::WHITE),
-                            )
-                            .fill(ACCENT_BLUE_DARK)
-                            .stroke(Stroke::new(1.0, ACCENT_BLUE))
-                            .min_size(Vec2::new(130.0, 28.0)),
-                        );
-
-                        let enter =
-                            edit.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter));
-                        if enter || connect_btn.clicked() {
-                            *do_connect = true;
-                        }
-                    }
-
-                    if let TechConnectionState::Connected { device } = &self.state {
-                        let ser = device.serial.clone();
-                        if ui
-                            .add(
-                                egui::Button::new(
-                                    RichText::new("Desconectar")
-                                        .size(11.0)
-                                        .strong()
-                                        .color(Color32::WHITE),
-                                )
-                                .fill(STATUS_RED_BG)
-                                .stroke(Stroke::new(1.0, STATUS_RED))
-                                .min_size(Vec2::new(90.0, 28.0)),
-                            )
-                            .clicked()
-                        {
-                            *do_disconnect = Some(ser);
-                        }
-                    }
+                    });
                 });
 
-                // Second compact row: Recent Endpoints chips (wraps cleanly on any width)
-                ui.add_space(4.0);
+                ui.add_space(8.0);
+
+                // Caja de Entrada Hero (Input Box Prominente con Recessed Glow)
+                let input_frame_bg = BG_RECESSED;
+                let input_stroke_color = if is_connecting {
+                    STATUS_AMBER
+                } else if is_connected {
+                    STATUS_GREEN
+                } else {
+                    Color32::from_rgb(38, 56, 84)
+                };
+
+                Frame::new()
+                    .fill(input_frame_bg)
+                    .stroke(Stroke::new(1.5, input_stroke_color))
+                    .corner_radius(CornerRadius::same(8))
+                    .inner_margin(Margin::symmetric(10, 8))
+                    .show(ui, |ui| {
+                        ui.set_width(ui.available_width());
+
+                        ui.horizontal(|ui| {
+                            // Icono visual de enlace o llave
+                            ui.label(
+                                RichText::new("ID / IP")
+                                    .size(11.0)
+                                    .strong()
+                                    .color(BORDER_ACCENT),
+                            );
+
+                            ui.add_space(6.0);
+
+                            // Campo de texto grande y de alto contraste
+                            let avail = ui.available_width();
+                            let reserve_w = if is_connecting {
+                                170.0
+                            } else if is_connected {
+                                260.0
+                            } else {
+                                230.0
+                            };
+                            let input_w = (avail - reserve_w).max(180.0);
+
+                            let text_edit = egui::TextEdit::singleline(&mut self.input_code)
+                                .hint_text("Pegue aquí el Código (ej. 8924-BE29-19BC-30DB) o IP:5555")
+                                .font(egui::TextStyle::Monospace)
+                                .text_color(TEXT_PRIMARY);
+
+                            let edit_response = ui.add_sized([input_w, 32.0], text_edit);
+
+                            // Botón de pegar desde el portapapeles si está vacío o para comodidad
+                            let paste_btn = ui.add(
+                                egui::Button::new(
+                                    RichText::new("Pegar")
+                                        .size(11.0)
+                                        .strong()
+                                        .color(BORDER_ACCENT),
+                                )
+                                .fill(Color32::from_rgb(20, 32, 50))
+                                .stroke(Stroke::new(1.0, Color32::from_rgb(40, 60, 90)))
+                                .min_size(Vec2::new(56.0, 32.0)),
+                            );
+
+                            if paste_btn.clicked() {
+                                let clip = ui.input(|i| {
+                                    i.events.iter().find_map(|e| {
+                                        if let egui::Event::Paste(s) = e {
+                                            Some(s.clone())
+                                        } else {
+                                            None
+                                        }
+                                    })
+                                });
+                                if let Some(text) = clip {
+                                    let trimmed = text.trim().to_string();
+                                    if !trimmed.is_empty() {
+                                        self.input_code = trimmed;
+                                    }
+                                }
+                            }
+
+                            // Botón de Limpiar si hay texto
+                            if !self.input_code.is_empty() {
+                                let clear_btn = ui.add(
+                                    egui::Button::new(
+                                        RichText::new("x")
+                                            .size(11.5)
+                                            .strong()
+                                            .color(TEXT_MUTED),
+                                    )
+                                    .fill(Color32::TRANSPARENT)
+                                    .min_size(Vec2::new(24.0, 32.0)),
+                                );
+                                if clear_btn.clicked() {
+                                    self.input_code.clear();
+                                }
+                            }
+
+                            ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                                if is_connecting {
+                                    if ui
+                                        .add(
+                                            egui::Button::new(
+                                                RichText::new("CANCELAR")
+                                                    .size(11.5)
+                                                    .strong()
+                                                    .color(Color32::WHITE),
+                                            )
+                                            .fill(STATUS_RED_BG)
+                                            .stroke(Stroke::new(1.0, STATUS_RED))
+                                            .min_size(Vec2::new(95.0, 32.0)),
+                                        )
+                                        .clicked()
+                                    {
+                                        *do_cancel = true;
+                                    }
+                                    ui.add(egui::Spinner::new().size(18.0));
+                                } else {
+                                    let connect_btn = ui.add(
+                                        egui::Button::new(
+                                            RichText::new("CONECTAR AHORA")
+                                                .size(12.0)
+                                                .strong()
+                                                .color(Color32::WHITE),
+                                        )
+                                        .fill(ACCENT_BLUE_DARK)
+                                        .stroke(Stroke::new(1.0, ACCENT_BLUE))
+                                        .min_size(Vec2::new(135.0, 32.0)),
+                                    );
+
+                                    let enter = edit_response.lost_focus()
+                                        && ui.input(|i| i.key_pressed(egui::Key::Enter));
+                                    if enter || connect_btn.clicked() {
+                                        *do_connect = true;
+                                    }
+
+                                    if let TechConnectionState::Connected { device } = &self.state {
+                                        let ser = device.serial.clone();
+                                        if ui
+                                            .add(
+                                                egui::Button::new(
+                                                    RichText::new("DESCONECTAR")
+                                                        .size(11.0)
+                                                        .strong()
+                                                        .color(Color32::WHITE),
+                                                )
+                                                .fill(STATUS_RED_BG)
+                                                .stroke(Stroke::new(1.0, STATUS_RED))
+                                                .min_size(Vec2::new(105.0, 32.0)),
+                                            )
+                                            .clicked()
+                                        {
+                                            *do_disconnect = Some(ser);
+                                        }
+                                    }
+                                }
+                            });
+                        });
+                    });
+
+                ui.add_space(6.0);
+
+                // Fila Inferior: Chips de Historial / Recientes y Guía Rápida
                 ui.horizontal_wrapped(|ui| {
                     ui.label(
-                        RichText::new("Recientes:")
+                        RichText::new("Historial Reciente:")
                             .size(10.0)
                             .strong()
                             .color(TEXT_MUTED),
                     );
+
                     let eps = self.recent_endpoints.clone();
-                    for ep in eps {
-                        if ui
-                            .small_button(RichText::new(&ep).monospace().size(10.5))
-                            .clicked()
-                        {
-                            self.input_code = ep;
+                    if eps.is_empty() {
+                        ui.label(
+                            RichText::new("Sin conexiones previas")
+                                .size(10.0)
+                                .italics()
+                                .color(TEXT_MUTED),
+                        );
+                    } else {
+                        for ep in eps {
+                            let is_active = self.input_code.trim() == ep.trim();
+                            let (chip_bg, chip_stroke, chip_fg) = if is_active {
+                                (Color32::from_rgb(20, 45, 75), ACCENT_BLUE, Color32::WHITE)
+                            } else {
+                                (Color32::from_rgb(18, 25, 40), BORDER_SUBTLE, TEXT_SECONDARY)
+                            };
+
+                            let btn = egui::Button::new(
+                                RichText::new(&ep)
+                                    .monospace()
+                                    .size(10.5)
+                                    .color(chip_fg),
+                            )
+                            .fill(chip_bg)
+                            .stroke(Stroke::new(1.0, chip_stroke))
+                            .corner_radius(CornerRadius::same(5));
+
+                            if ui.add(btn).clicked() {
+                                self.input_code = ep;
+                            }
                         }
                     }
+
+                    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                        ui.label(
+                            RichText::new("Acepta códigos AnyDesk (16 car.) o IP:5555 • Presione Enter para conectar")
+                                .size(9.5)
+                                .color(TEXT_MUTED),
+                        );
+                    });
                 });
 
                 if let TechConnectionState::Error(err) = &self.state {
-                    ui.add_space(4.0);
+                    ui.add_space(6.0);
                     Frame::new()
                         .fill(STATUS_RED_BG)
                         .stroke(Stroke::new(1.0, STATUS_RED))
-                        .corner_radius(CornerRadius::same(5))
-                        .inner_margin(Margin::symmetric(8, 5))
+                        .corner_radius(CornerRadius::same(6))
+                        .inner_margin(Margin::symmetric(10, 7))
                         .show(ui, |ui| {
                             ui.set_width(ui.available_width());
-                            ui.label(RichText::new(err).size(11.0).color(Color32::WHITE));
+                            ui.horizontal(|ui| {
+                                ui.label(
+                                    RichText::new("!")
+                                        .size(13.0)
+                                        .strong()
+                                        .color(STATUS_RED),
+                                );
+                                ui.label(RichText::new(err).size(11.0).color(Color32::WHITE));
+                            });
                         });
                 }
             });
