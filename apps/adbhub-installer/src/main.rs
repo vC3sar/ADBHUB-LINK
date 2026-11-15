@@ -282,8 +282,37 @@ fn main() {
         project_root.join(r"target\debug\adbhub-desktop.exe"),
     ];
 
+    let adb_candidates = [
+        root_dir.join("adb.exe"),
+        project_root.join("adb.exe"),
+        project_root.join(r"DIST-RELEASES\Windows-Tecnico\adb.exe"),
+    ];
+    let win_api_candidates = [
+        root_dir.join("AdbWinApi.dll"),
+        project_root.join("AdbWinApi.dll"),
+        project_root.join(r"DIST-RELEASES\Windows-Tecnico\AdbWinApi.dll"),
+    ];
+    let win_usb_candidates = [
+        root_dir.join("AdbWinUsbApi.dll"),
+        project_root.join("AdbWinUsbApi.dll"),
+        project_root.join(r"DIST-RELEASES\Windows-Tecnico\AdbWinUsbApi.dll"),
+    ];
+
+    let deploy_adb_stack = |target_dir: &Path| {
+        if let Some(src) = find_file_in_candidates(&adb_candidates) {
+            let _ = fs::copy(&src, target_dir.join("adb.exe"));
+        }
+        if let Some(src) = find_file_in_candidates(&win_api_candidates) {
+            let _ = fs::copy(&src, target_dir.join("AdbWinApi.dll"));
+        }
+        if let Some(src) = find_file_in_candidates(&win_usb_candidates) {
+            let _ = fs::copy(&src, target_dir.join("AdbWinUsbApi.dll"));
+        }
+    };
+
     if install_agent {
         let _ = fs::create_dir_all(&agent_dir);
+        deploy_adb_stack(&agent_dir);
         if let Some(src) = find_file_in_candidates(&agent_candidates) {
             let dest = agent_dir.join("adbhub-agent.exe");
             if fs::copy(&src, &dest).is_ok() {
@@ -331,6 +360,7 @@ fn main() {
     if install_desktop {
         let _ = fs::create_dir_all(&desktop_dir);
         let _ = fs::create_dir_all(desktop_dir.join("data"));
+        deploy_adb_stack(&desktop_dir);
         if let Some(src) = find_file_in_candidates(&desktop_candidates) {
             let dest = desktop_dir.join("adbhub-desktop.exe");
             if fs::copy(&src, &dest).is_ok() {

@@ -53,7 +53,14 @@ Source: "..\packages\usbipd-win.msi"; DestDir: "{tmp}"; Flags: ignoreversion del
 Source: "..\packages\usbip-win2.exe"; DestDir: "{tmp}"; Flags: ignoreversion deleteafterinstall; Components: desktop
 ; Binarios compilados en target\release (o target\debug como fallback)
 Source: "..\..\target\release\adbhub-desktop.exe"; DestDir: "{app}\Desktop"; DestName: "adbhub-desktop.exe"; Components: desktop; Flags: ignoreversion
+Source: "..\..\adb.exe"; DestDir: "{app}\Desktop"; Flags: ignoreversion; Components: desktop
+Source: "..\..\AdbWinApi.dll"; DestDir: "{app}\Desktop"; Flags: ignoreversion; Components: desktop
+Source: "..\..\AdbWinUsbApi.dll"; DestDir: "{app}\Desktop"; Flags: ignoreversion; Components: desktop
+
 Source: "..\..\target\release\adbhub-agent.exe"; DestDir: "{app}\Agent"; DestName: "adbhub-agent.exe"; Components: agent; Flags: ignoreversion
+Source: "..\..\adb.exe"; DestDir: "{app}\Agent"; Flags: ignoreversion; Components: agent
+Source: "..\..\AdbWinApi.dll"; DestDir: "{app}\Agent"; Flags: ignoreversion; Components: agent
+Source: "..\..\AdbWinUsbApi.dll"; DestDir: "{app}\Agent"; Flags: ignoreversion; Components: agent
 Source: "..\..\frontend\desktop\index.html"; DestDir: "{app}\Desktop\frontend"; Components: desktop; Flags: ignoreversion
 Source: "..\..\docs\*"; DestDir: "{app}\Docs"; Flags: ignoreversion recursesubdirs createallsubdirs
 

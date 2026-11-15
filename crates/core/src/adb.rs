@@ -321,9 +321,30 @@ impl AdbDeviceInfo {
 #[derive(Debug, Clone, Copy, Default)]
 pub struct AdbEngine;
 
+#[cfg(windows)]
+const EMBEDDED_ADB_WIN_API: &[u8] = include_bytes!("../../../AdbWinApi.dll");
+#[cfg(windows)]
+const EMBEDDED_ADB_WIN_USB_API: &[u8] = include_bytes!("../../../AdbWinUsbApi.dll");
+
 impl AdbEngine {
     pub fn new() -> Self {
         Self
+    }
+
+    /// On Windows, ensures `AdbWinApi.dll` and `AdbWinUsbApi.dll` exist in the directory
+    /// where `adb.exe` is located. If either DLL was accidentally omitted during unpacking
+    /// or deleted, this function automatically self-heals by extracting them to prevent
+    /// Windows error 0xC0000135 (STATUS_DLL_NOT_FOUND).
+    #[cfg(windows)]
+    pub fn ensure_windows_dlls_present(dir: &std::path::Path) {
+        let dll1 = dir.join("AdbWinApi.dll");
+        if !dll1.exists() {
+            let _ = std::fs::write(&dll1, EMBEDDED_ADB_WIN_API);
+        }
+        let dll2 = dir.join("AdbWinUsbApi.dll");
+        if !dll2.exists() {
+            let _ = std::fs::write(&dll2, EMBEDDED_ADB_WIN_USB_API);
+        }
     }
 
     /// Returns true if a serial identifier represents a remote network endpoint or virtual emulator.
@@ -340,6 +361,33 @@ impl AdbEngine {
         }
     }
 
+    /// Validates that ADB and all required companion libraries (AdbWinApi.dll, AdbWinUsbApi.dll)
+    /// are operational. Returns the first line of `adb version` on success.
+    pub fn validate_environment() -> Result<String, String> {
+        let output = Self::adb_command()
+            .arg("version")
+            .output()
+            .map_err(|e| {
+                format!(
+                    "No se pudo ejecutar '{}': {e}. En Windows, verifique que 'adb.exe', 'AdbWinApi.dll' y 'AdbWinUsbApi.dll' estén en la misma carpeta.",
+                    Self::adb_binary_name()
+                )
+            })?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(format!(
+                "El comando ADB finalizó con error (código {:?}): {}",
+                output.status.code(),
+                stderr.trim()
+            ));
+        }
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let first_line = stdout.lines().next().unwrap_or("Android Debug Bridge");
+        Ok(first_line.trim().to_string())
+    }
+
     /// Creates a Command configured with the optimal path to adb (local bundled binary preferred over system PATH),
     /// ensuring correct working directory and local DLL resolution without crashing or flashing consoles.
     pub fn adb_command() -> Command {
@@ -348,11 +396,18 @@ impl AdbEngine {
             if let Some(parent) = exe.parent() {
                 let candidate = parent.join(Self::adb_binary_name());
                 if candidate.exists() {
+                    #[cfg(windows)]
+                    Self::ensure_windows_dlls_present(parent);
+
                     (candidate, Some(parent.to_path_buf()))
                 } else {
                     let local = std::path::Path::new(Self::adb_binary_name());
                     if local.exists() {
                         let cur = std::env::current_dir().ok();
+                        #[cfg(windows)]
+                        if let Some(ref d) = cur {
+                            Self::ensure_windows_dlls_present(d);
+                        }
                         (local.to_path_buf(), cur)
                     } else {
                         (std::path::PathBuf::from(Self::adb_binary_name()), None)

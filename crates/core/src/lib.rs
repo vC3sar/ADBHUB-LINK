@@ -291,4 +291,12 @@ mod tests {
         assert!(AnyDeskCode::parse_flexible("invalid").is_err());
         Ok(())
     }
+
+    #[test]
+    fn test_adb_environment_validation() {
+        let version = AdbEngine::validate_environment();
+        assert!(version.is_ok(), "ADB environment validation failed: {:?}", version.err());
+        let ver_str = version.unwrap();
+        assert!(ver_str.contains("Android Debug Bridge"), "Unexpected version: {ver_str}");
+    }
 }
