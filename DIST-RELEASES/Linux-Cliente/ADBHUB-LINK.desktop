@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=2.0
+Type=Application
+Name=ADBHUB-LINK
+GenericName=Soporte Remoto ADB
+Comment=Estación Cliente de Soporte Remoto ADB / OTG
+Exec=bash -c "cd \"$(dirname \"%k\")\" && ./ADBHUB-LINK.sh"
+Icon=./ADBHUB-LINK.png
+Terminal=false
+Categories=Development;Utility;
+Keywords=adb;android;remote;support;usb;
+StartupNotify=true

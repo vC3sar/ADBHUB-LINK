@@ -139,6 +139,11 @@ fn parse_cli_args() -> CoreResult<AgentCliCommand> {
 }
 
 fn main() -> CoreResult<()> {
+    // Force DirectX 12 backend to prevent crashes with third-party Vulkan layers (e.g. Medal, OBS, RivaTuner)
+    if std::env::var("WGPU_BACKEND").is_err() {
+        std::env::set_var("WGPU_BACKEND", "dx12");
+    }
+
     let filter_layer =
         EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
     tracing_subscriber::fmt()

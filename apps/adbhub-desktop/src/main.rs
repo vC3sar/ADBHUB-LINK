@@ -18,6 +18,10 @@ use tracing::info;
 use tracing_subscriber::EnvFilter;
 
 fn main() -> CoreResult<()> {
+    if std::env::var("WGPU_BACKEND").is_err() {
+        std::env::set_var("WGPU_BACKEND", "dx12");
+    }
+
     let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
     tracing_subscriber::fmt()
         .with_env_filter(filter)

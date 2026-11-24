@@ -15,6 +15,7 @@ venv/
 
 # Package staging (dist temporary unpack directory)
 dist/ADBHUB-LINK/
+DIST-PACKAGES/
 
 # OS and Editor junk
 Thumbs.db

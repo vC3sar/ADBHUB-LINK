@@ -11,8 +11,8 @@ use std::time::Instant;
 use adbhub_core::{AdbDeviceInfo, AdbDeviceState, AdbEngine, AnyDeskCode};
 use adbhub_usb_discovery::{DiscoveryFilter, UsbDiscoveryEngine};
 use eframe::egui::{
-    self, Align, CentralPanel, Color32, CornerRadius, FontData, FontDefinitions, FontFamily, Frame,
-    Layout, Margin, Panel, Pos2, RichText, ScrollArea, Sense, Stroke, Vec2,
+    self, Align, Align2, CentralPanel, Color32, CornerRadius, FontData, FontDefinitions, FontFamily, Frame,
+    Layout, Margin, Panel, Pos2, Rect, RichText, ScrollArea, Sense, Stroke, Vec2,
 };
 
 // ============================================================================
@@ -105,6 +105,8 @@ enum HardwareUpdate {
 pub struct AgentGuiApp {
     code: AnyDeskCode,
     code_salt: u8,
+    is_numeric_mode: bool,
+    code_copied_time: Option<Instant>,
     tunnel_port: u16,
     adb: AdbEngine,
     local_ip: String,
@@ -164,6 +166,8 @@ impl AgentGuiApp {
         let mut app = Self {
             code,
             code_salt,
+            is_numeric_mode: false,
+            code_copied_time: None,
             tunnel_port: 0,
             adb,
             local_ip,
@@ -401,7 +405,11 @@ impl AgentGuiApp {
                 }
                 HardwareUpdate::TunnelPortAssigned { port } => {
                     self.tunnel_port = port;
-                    self.code = AnyDeskCode::encode_station(&self.local_ip, port, self.code_salt);
+                    if self.is_numeric_mode {
+                        self.code = AnyDeskCode::encode_numeric_station(&self.local_ip, port);
+                    } else {
+                        self.code = AnyDeskCode::encode_station(&self.local_ip, port, self.code_salt);
+                    }
                     self.status_message = format!(
                         "Túnel global VPN/Internet activo (bore.pub:{port}). Código listo."
                     );
@@ -423,6 +431,7 @@ impl AgentGuiApp {
     // ========================================================================
     // CUSTOM VECTOR DRAWING HELPERS
     // ========================================================================
+    #[allow(dead_code)]
     fn draw_status_dot(ui: &mut egui::Ui, color: Color32) {
         let (rect, _) = ui.allocate_exact_size(Vec2::new(14.0, 14.0), Sense::hover());
         let center = rect.center();
@@ -436,28 +445,55 @@ impl AgentGuiApp {
     }
 
     fn draw_brand_mark(ui: &mut egui::Ui) {
-        let (rect, _) = ui.allocate_exact_size(Vec2::new(28.0, 28.0), Sense::hover());
+        let size = 30.0;
+        let (rect, _) = ui.allocate_exact_size(Vec2::splat(size), Sense::hover());
         let painter = ui.painter();
-        painter.rect_filled(rect, CornerRadius::same(6), ACCENT_BLUE_DARK);
+
+        // Fondo squircle oscuro oficial #0A0B10
+        let corner_r = 7;
+        painter.rect_filled(rect, CornerRadius::same(corner_r), Color32::from_rgb(10, 11, 16));
         painter.rect_stroke(
             rect,
-            CornerRadius::same(6),
-            Stroke::new(1.0, BORDER_ACCENT),
+            CornerRadius::same(corner_r),
+            Stroke::new(1.0, Color32::from_rgb(38, 56, 84)),
             egui::StrokeKind::Inside,
         );
-        let c = rect.center();
-        let p_left = Pos2::new(c.x - 6.0, c.y);
-        let p_right = Pos2::new(c.x + 6.0, c.y);
-        let p_top = Pos2::new(c.x + 1.0, c.y - 5.0);
-        let p_bot = Pos2::new(c.x + 1.0, c.y + 5.0);
-        let stroke = Stroke::new(1.8, Color32::WHITE);
-        painter.line_segment([p_left, p_right], stroke);
-        painter.line_segment([p_left, p_top], stroke);
-        painter.line_segment([p_left, p_bot], stroke);
-        painter.circle_filled(p_left, 2.5, BORDER_ACCENT);
-        painter.circle_filled(p_right, 2.5, Color32::WHITE);
-        painter.circle_filled(p_top, 2.0, Color32::WHITE);
-        painter.circle_filled(p_bot, 2.0, Color32::WHITE);
+
+        let rx = rect.min.x;
+        let ry = rect.min.y;
+
+        // Pilar izquierdo oficial (Blanco)
+        let pillar_w = 2.6;
+        let pillar_h = 15.2;
+        let left_pillar = Rect::from_min_size(
+            Pos2::new(rx + 7.8, ry + 7.4),
+            Vec2::new(pillar_w, pillar_h),
+        );
+        painter.rect_filled(left_pillar, CornerRadius::same(1), Color32::WHITE);
+
+        // Pilar derecho oficial (Blanco)
+        let right_pillar = Rect::from_min_size(
+            Pos2::new(rx + 19.6, ry + 7.4),
+            Vec2::new(pillar_w, pillar_h),
+        );
+        painter.rect_filled(right_pillar, CornerRadius::same(1), Color32::WHITE);
+
+        // Conector de puente izquierdo (Blanco)
+        let left_notch = Rect::from_min_size(
+            Pos2::new(rx + 9.9, ry + 13.9),
+            Vec2::new(2.5, 2.2),
+        );
+        painter.rect_filled(left_notch, CornerRadius::ZERO, Color32::WHITE);
+
+        // Conector de puente derecho (Blanco)
+        let right_notch = Rect::from_min_size(
+            Pos2::new(rx + 17.5, ry + 13.9),
+            Vec2::new(2.5, 2.2),
+        );
+        painter.rect_filled(right_notch, CornerRadius::ZERO, Color32::WHITE);
+
+        // Nodo central de conexion #9A8CFF
+        painter.circle_filled(rect.center(), 2.4, Color32::from_rgb(154, 140, 255));
     }
 
     fn draw_phone_vector(ui: &mut egui::Ui, accent: Color32) {
@@ -494,6 +530,50 @@ impl AgentGuiApp {
             });
     }
 
+    fn render_endpoint_card(
+        ui: &mut egui::Ui,
+        title: &str,
+        value: &str,
+        accent_color: Color32,
+        copy_label: &str,
+    ) -> bool {
+        let mut copied = false;
+        Frame::new()
+            .fill(BG_RECESSED)
+            .stroke(Stroke::new(1.0, BORDER_SUBTLE))
+            .corner_radius(CornerRadius::same(RADIUS_MEDIUM))
+            .inner_margin(Margin::same(SPACE_SM as i8))
+            .show(ui, |ui| {
+                ui.set_width(ui.available_width());
+                ui.horizontal(|ui| {
+                    ui.label(RichText::new(title).size(TYPO_LABEL).strong().color(TEXT_MUTED));
+                    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                        let btn = egui::Button::new(
+                            RichText::new(copy_label)
+                                .size(TYPO_LABEL)
+                                .strong()
+                                .color(Color32::WHITE),
+                        )
+                        .fill(Color32::from_rgb(26, 38, 58))
+                        .stroke(Stroke::new(1.0, accent_color))
+                        .min_size(Vec2::new(72.0, 24.0));
+                        if ui.add(btn).clicked() {
+                            copied = true;
+                        }
+                    });
+                });
+                ui.add_space(3.0);
+                ui.label(
+                    RichText::new(value)
+                        .size(TYPO_BODY)
+                        .monospace()
+                        .strong()
+                        .color(accent_color),
+                );
+            });
+        copied
+    }
+
     fn render_left_credentials_panel(&mut self, ui: &mut egui::Ui) {
         ScrollArea::vertical()
             .id_salt("left_credentials_scroll")
@@ -522,34 +602,75 @@ impl AgentGuiApp {
                         );
                         ui.add_space(SPACE_SM);
 
-                        // Recessed Code Display Box
-                        Frame::new()
-                            .fill(BG_RECESSED)
-                            .stroke(Stroke::new(1.0, Color32::from_rgb(38, 56, 84)))
+                        let code_font_size = if self.is_numeric_mode { 21.0 } else { 17.5 };
+                        let just_copied = self
+                            .code_copied_time
+                            .map_or(false, |t| t.elapsed().as_secs() < 3);
+
+                        // Recessed Code Display Box with Tap-to-Copy
+                        let code_box_res = Frame::new()
+                            .fill(if just_copied {
+                                Color32::from_rgb(8, 42, 30)
+                            } else {
+                                BG_RECESSED
+                            })
+                            .stroke(Stroke::new(
+                                1.0,
+                                if just_copied {
+                                    STATUS_GREEN
+                                } else {
+                                    Color32::from_rgb(38, 56, 84)
+                                },
+                            ))
                             .corner_radius(CornerRadius::same(RADIUS_MEDIUM))
                             .inner_margin(Margin::symmetric(SPACE_MD as i8, SPACE_SM as i8))
                             .show(ui, |ui| {
                                 ui.set_width(ui.available_width());
                                 ui.vertical_centered(|ui| {
-                                    ui.label(
-                                        RichText::new("CÓDIGO DE EMPAREJAMIENTO")
-                                            .size(TYPO_LABEL)
-                                            .strong()
-                                            .color(TEXT_MUTED),
-                                    );
+                                    if just_copied {
+                                        ui.label(
+                                            RichText::new("✓ ¡COPIADO AL PORTAPAPELES!")
+                                                .size(TYPO_LABEL)
+                                                .strong()
+                                                .color(STATUS_GREEN),
+                                        );
+                                    } else {
+                                        ui.label(
+                                            RichText::new("CÓDIGO DE EMPAREJAMIENTO  •  Clic para copiar")
+                                                .size(TYPO_LABEL)
+                                                .strong()
+                                                .color(TEXT_MUTED),
+                                        );
+                                    }
                                     ui.add_space(SPACE_XS);
                                     ui.label(
                                         RichText::new(self.code.as_str())
-                                            .size(TYPO_MONO_CODE)
+                                            .size(code_font_size)
                                             .strong()
                                             .monospace()
-                                            .color(BORDER_ACCENT),
+                                            .color(if just_copied {
+                                                STATUS_GREEN
+                                            } else {
+                                                BORDER_ACCENT
+                                            }),
                                     );
                                 });
                             });
 
+                        let code_interact = ui.interact(
+                            code_box_res.response.rect,
+                            ui.scope_id().with("code_box_tap"),
+                            Sense::click(),
+                        );
+                        if code_interact.clicked() {
+                            ui.ctx().copy_text(self.code.as_str().to_string());
+                            self.code_copied_time = Some(Instant::now());
+                            self.status_message = "Código copiado al portapapeles.".to_string();
+                        }
+
                         ui.add_space(SPACE_SM);
 
+                        // Primary Action Buttons
                         let copy_btn = egui::Button::new(
                             RichText::new("COPIAR CÓDIGO DE ESTACIÓN")
                                 .size(TYPO_BUTTON)
@@ -558,24 +679,66 @@ impl AgentGuiApp {
                         )
                         .fill(ACCENT_BLUE_DARK)
                         .stroke(Stroke::new(1.0, ACCENT_BLUE))
-                        .min_size(Vec2::new(ui.available_width(), 36.0));
+                        .min_size(Vec2::new(ui.available_width(), 34.0));
 
                         if ui.add(copy_btn).clicked() {
                             ui.ctx().copy_text(self.code.as_str().to_string());
+                            self.code_copied_time = Some(Instant::now());
                             self.status_message =
                                 "Código de estación copiado al portapapeles.".to_string();
                         }
 
                         ui.add_space(SPACE_XS);
-                        ui.columns(2, |cols| {
-                            if cols[0]
-                                .add_sized(
-                                    [cols[0].available_width(), 30.0],
-                                    egui::Button::new(RichText::new("Nuevo ID").size(TYPO_LABEL)),
+
+                        let share_btn = egui::Button::new(
+                            RichText::new("📱 Compartir para WhatsApp / Chat")
+                                .size(TYPO_BUTTON)
+                                .strong()
+                                .color(Color32::WHITE),
+                        )
+                        .fill(Color32::from_rgb(18, 55, 38))
+                        .stroke(Stroke::new(1.0, STATUS_GREEN))
+                        .min_size(Vec2::new(ui.available_width(), 32.0));
+
+                        if ui.add(share_btn).clicked() {
+                            let msg = if self.tunnel_port > 0 {
+                                format!(
+                                    "ADBHUB-LINK Soporte Remoto:\nMi Código de Estación es: {}\nRelay: bore.pub:{}\nPor favor conéctate para revisar mi teléfono.",
+                                    self.code.as_str(),
+                                    self.tunnel_port
                                 )
-                                .clicked()
-                            {
-                                self.code_salt = self.code_salt.wrapping_add(17).max(1);
+                            } else {
+                                format!(
+                                    "ADBHUB-LINK Soporte Remoto:\nMi Código de Estación es: {}\nIP LAN: {}:5555\nPor favor conéctate para revisar mi teléfono.",
+                                    self.code.as_str(),
+                                    self.local_ip
+                                )
+                            };
+                            ui.ctx().copy_text(msg);
+                            self.code_copied_time = Some(Instant::now());
+                            self.status_message =
+                                "Mensaje listo para WhatsApp copiado al portapapeles.".to_string();
+                        }
+
+                        ui.add_space(SPACE_SM);
+
+                        // Segmented Control: [ 16-HEX ] | [ 9 DÍGITOS ] | [ ⟳ ]
+                        ui.horizontal(|ui| {
+                            let btn_w = (ui.available_width() - 44.0) / 2.0;
+                            let hex_active = !self.is_numeric_mode;
+
+                            let hex_btn = egui::Button::new(
+                                RichText::new("🔤 16-HEX")
+                                    .size(TYPO_LABEL)
+                                    .strong()
+                                    .color(if hex_active { Color32::WHITE } else { TEXT_SECONDARY }),
+                            )
+                            .fill(if hex_active { ACCENT_BLUE_DARK } else { BG_RECESSED })
+                            .stroke(Stroke::new(1.0, if hex_active { BORDER_ACCENT } else { BORDER_SUBTLE }))
+                            .min_size(Vec2::new(btn_w, 28.0));
+
+                            if ui.add(hex_btn).clicked() && self.is_numeric_mode {
+                                self.is_numeric_mode = false;
                                 self.code = AnyDeskCode::encode_station(
                                     &self.local_ip,
                                     self.tunnel_port,
@@ -583,90 +746,103 @@ impl AgentGuiApp {
                                 );
                                 self.activity_log.insert(
                                     0,
-                                    (
-                                        "SEGURIDAD".to_string(),
-                                        format!("Nuevo ID generado: {}", self.code.as_str()),
-                                    ),
+                                    ("MODO".to_string(), format!("Cambiado a formato 16-HEX: {}", self.code.as_str())),
                                 );
                             }
-                            if cols[1]
-                                .add_sized(
-                                    [cols[1].available_width(), 30.0],
-                                    egui::Button::new(RichText::new("9 Dígitos").size(TYPO_LABEL)),
-                                )
-                                .clicked()
-                            {
+
+                            let num_active = self.is_numeric_mode;
+                            let num_btn = egui::Button::new(
+                                RichText::new("🔢 9 DÍGITOS")
+                                    .size(TYPO_LABEL)
+                                    .strong()
+                                    .color(if num_active { Color32::WHITE } else { TEXT_SECONDARY }),
+                            )
+                            .fill(if num_active { ACCENT_BLUE_DARK } else { BG_RECESSED })
+                            .stroke(Stroke::new(1.0, if num_active { BORDER_ACCENT } else { BORDER_SUBTLE }))
+                            .min_size(Vec2::new(btn_w, 28.0));
+
+                            if ui.add(num_btn).clicked() && !self.is_numeric_mode {
+                                self.is_numeric_mode = true;
                                 self.code = AnyDeskCode::encode_numeric_station(
                                     &self.local_ip,
                                     self.tunnel_port,
                                 );
+                                self.activity_log.insert(
+                                    0,
+                                    ("MODO".to_string(), format!("Cambiado a formato 9 Dígitos: {}", self.code.as_str())),
+                                );
+                            }
+
+                            let refresh_btn = egui::Button::new(
+                                RichText::new("⟳")
+                                    .size(TYPO_BODY_LARGE)
+                                    .strong()
+                                    .color(BORDER_ACCENT),
+                            )
+                            .fill(BG_RECESSED)
+                            .stroke(Stroke::new(1.0, BORDER_SUBTLE))
+                            .min_size(Vec2::new(36.0, 28.0));
+
+                            if ui.add(refresh_btn).on_hover_text("Generar nuevo ID aleatorio").clicked() {
+                                self.code_salt = self.code_salt.wrapping_add(17).max(1);
+                                if self.is_numeric_mode {
+                                    self.code = AnyDeskCode::encode_numeric_station(
+                                        &self.local_ip,
+                                        self.tunnel_port,
+                                    );
+                                } else {
+                                    self.code = AnyDeskCode::encode_station(
+                                        &self.local_ip,
+                                        self.tunnel_port,
+                                        self.code_salt,
+                                    );
+                                }
+                                self.activity_log.insert(
+                                    0,
+                                    ("SEGURIDAD".to_string(), format!("Nuevo ID regenerado: {}", self.code.as_str())),
+                                );
+                                self.status_message = format!("Nuevo ID generado: {}", self.code.as_str());
                             }
                         });
 
                         ui.add_space(SPACE_SM);
                         ui.separator();
-                        ui.add_space(SPACE_XS);
+                        ui.add_space(SPACE_SM);
 
+                        // Endpoint Cards (Dedicated row for values to eliminate collisions)
                         let endpoint = format!("{}:5555", self.local_ip);
-                        ui.horizontal(|ui| {
-                            ui.vertical(|ui| {
-                                ui.label(
-                                    RichText::new("ENDPOINT DIRECTO LAN")
-                                        .size(TYPO_LABEL)
-                                        .strong()
-                                        .color(TEXT_MUTED),
-                                );
-                                ui.label(
-                                    RichText::new(&endpoint)
-                                        .size(TYPO_BODY)
-                                        .monospace()
-                                        .strong()
-                                        .color(STATUS_GREEN),
-                                );
-                            });
-                            ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                                if ui.add_sized([80.0, 28.0], egui::Button::new(RichText::new("Copiar IP").size(TYPO_LABEL))).clicked() {
-                                    ui.ctx().copy_text(endpoint);
-                                    self.status_message =
-                                        "Dirección IP:5555 copiada al portapapeles.".to_string();
-                                }
-                            });
-                        });
+                        if Self::render_endpoint_card(
+                            ui,
+                            "ENDPOINT DIRECTO LAN",
+                            &endpoint,
+                            STATUS_GREEN,
+                            "Copiar IP",
+                        ) {
+                            ui.ctx().copy_text(endpoint);
+                            self.status_message =
+                                "Dirección IP:5555 copiada al portapapeles.".to_string();
+                        }
 
                         if self.tunnel_port > 0 {
                             ui.add_space(SPACE_XS);
                             let cloud_ep = format!("bore.pub:{}", self.tunnel_port);
-                            ui.horizontal(|ui| {
-                                ui.vertical(|ui| {
-                                    ui.label(
-                                        RichText::new("RELAY GLOBAL VPN / INTERNET")
-                                            .size(TYPO_LABEL)
-                                            .strong()
-                                            .color(TEXT_MUTED),
-                                    );
-                                    ui.label(
-                                        RichText::new(&cloud_ep)
-                                            .size(TYPO_BODY)
-                                            .monospace()
-                                            .strong()
-                                            .color(BORDER_ACCENT),
-                                    );
-                                });
-                                ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                                    if ui.add_sized([90.0, 28.0], egui::Button::new(RichText::new("Copiar Relay").size(TYPO_LABEL))).clicked() {
-                                        ui.ctx().copy_text(cloud_ep);
-                                        self.status_message =
-                                            "Endpoint Relay Global copiado al portapapeles."
-                                                .to_string();
-                                    }
-                                });
-                            });
+                            if Self::render_endpoint_card(
+                                ui,
+                                "RELAY GLOBAL VPN / INTERNET",
+                                &cloud_ep,
+                                BORDER_ACCENT,
+                                "Copiar Relay",
+                            ) {
+                                ui.ctx().copy_text(cloud_ep);
+                                self.status_message =
+                                    "Endpoint Relay Global copiado al portapapeles.".to_string();
+                            }
                         }
                     });
 
                 ui.add_space(SPACE_SM);
 
-                // CARD 2: LIVE 3-STEP CONNECTION CHECKLIST
+                // CARD 2: LIVE 3-STEP CONNECTION CHECKLIST (STEPPER VISUAL)
                 let has_usb_cable =
                     !self.local_adb_devices.is_empty() || !self.detected_usb_mobiles.is_empty();
                 let has_adb_mode = !self.local_adb_devices.is_empty();
@@ -700,6 +876,7 @@ impl AgentGuiApp {
                                 "Conecte el móvil por USB"
                             },
                             has_usb_cable,
+                            !has_usb_cable,
                         );
                         ui.add_space(SPACE_XS);
                         Self::render_step_row(
@@ -712,6 +889,7 @@ impl AgentGuiApp {
                                 "Activar en Ajustes"
                             },
                             has_adb_mode,
+                            has_usb_cable && !has_adb_mode,
                         );
                         ui.add_space(SPACE_XS);
                         Self::render_step_row(
@@ -724,55 +902,91 @@ impl AgentGuiApp {
                                 "Aceptar en pantalla"
                             },
                             has_rsa_auth,
+                            has_adb_mode && !has_rsa_auth,
                         );
                     });
             });
     }
 
-    fn render_step_row(ui: &mut egui::Ui, num: &str, title: &str, subtitle: &str, done: bool) {
-        let (fg, bg, badge_txt) = if done {
-            (STATUS_GREEN, STATUS_GREEN_BG, "OK")
+    fn render_step_row(
+        ui: &mut egui::Ui,
+        step_num: &str,
+        title: &str,
+        subtitle: &str,
+        done: bool,
+        active_in_progress: bool,
+    ) {
+        let (border_col, bg_col, icon_txt, icon_fg, icon_bg) = if done {
+            (
+                Color32::from_rgb(16, 100, 75),
+                Color32::from_rgb(8, 25, 20),
+                "✓",
+                STATUS_GREEN,
+                STATUS_GREEN_BG,
+            )
+        } else if active_in_progress {
+            (
+                BORDER_ACCENT,
+                Color32::from_rgb(12, 28, 48),
+                "!",
+                BORDER_ACCENT,
+                Color32::from_rgb(14, 50, 80),
+            )
         } else {
-            (TEXT_SECONDARY, BG_RECESSED, num)
+            (
+                BORDER_SUBTLE,
+                BG_RECESSED,
+                step_num,
+                TEXT_MUTED,
+                Color32::from_rgb(18, 24, 36),
+            )
         };
 
         Frame::new()
-            .fill(BG_RECESSED)
-            .stroke(Stroke::new(
-                1.0,
-                if done {
-                    Color32::from_rgb(16, 100, 75)
-                } else {
-                    BORDER_SUBTLE
-                },
-            ))
+            .fill(bg_col)
+            .stroke(Stroke::new(1.0, border_col))
             .corner_radius(CornerRadius::same(RADIUS_MEDIUM))
-            .inner_margin(Margin::symmetric(SPACE_SM as i8, SPACE_SM as i8))
+            .inner_margin(Margin::symmetric(SPACE_SM as i8, 6))
             .show(ui, |ui| {
                 ui.set_width(ui.available_width());
                 ui.horizontal(|ui| {
-                    Frame::new()
-                        .fill(bg)
-                        .stroke(Stroke::new(1.0, fg))
-                        .corner_radius(CornerRadius::same(RADIUS_SMALL))
-                        .inner_margin(Margin::symmetric(SPACE_SM as i8, SPACE_XS as i8))
-                        .show(ui, |ui| {
-                            ui.label(
-                                RichText::new(badge_txt)
-                                    .size(TYPO_LABEL)
-                                    .monospace()
-                                    .strong()
-                                    .color(fg),
-                            );
-                        });
+                    let (rect, _) = ui.allocate_exact_size(Vec2::new(22.0, 22.0), Sense::hover());
+                    let painter = ui.painter();
+                    painter.circle_filled(rect.center(), 11.0, icon_bg);
+                    painter.circle_stroke(rect.center(), 11.0, Stroke::new(1.0, icon_fg));
+                    painter.text(
+                        rect.center(),
+                        Align2::CENTER_CENTER,
+                        icon_txt,
+                        egui::FontId::proportional(12.0),
+                        icon_fg,
+                    );
+
+                    ui.add_space(SPACE_XS);
                     ui.vertical(|ui| {
                         ui.label(
                             RichText::new(title)
-                                .size(TYPO_BODY)
+                                .size(TYPO_BODY_SMALL)
                                 .strong()
-                                .color(if done { TEXT_PRIMARY } else { TEXT_SECONDARY }),
+                                .color(if done {
+                                    TEXT_PRIMARY
+                                } else if active_in_progress {
+                                    Color32::WHITE
+                                } else {
+                                    TEXT_SECONDARY
+                                }),
                         );
-                        ui.label(RichText::new(subtitle).size(TYPO_BODY_SMALL).color(TEXT_MUTED));
+                        ui.label(
+                            RichText::new(subtitle)
+                                .size(12.0)
+                                .color(if done {
+                                    STATUS_GREEN
+                                } else if active_in_progress {
+                                    STATUS_AMBER
+                                } else {
+                                    TEXT_MUTED
+                                }),
+                        );
                     });
                 });
             });
@@ -948,7 +1162,7 @@ impl AgentGuiApp {
 
     fn render_devices_tab(&mut self, ui: &mut egui::Ui) {
         let mut bridge_request: Option<String> = None;
-        let wide = ui.available_width() >= 480.0;
+        let wide = ui.available_width() >= 680.0;
 
         if !self.local_adb_devices.is_empty() {
             let devices = self.local_adb_devices.clone();
@@ -1436,7 +1650,27 @@ impl eframe::App for AgentGuiApp {
                     .stroke(Stroke::new(1.0, BORDER_SUBTLE)),
             )
             .show(ui, |ui| {
-                ui.horizontal_wrapped(|ui| {
+                let authorized_count = self
+                    .local_adb_devices
+                    .iter()
+                    .filter(|d| d.state == AdbDeviceState::Device)
+                    .count();
+
+                let (status_txt, status_fg, status_bg) = if authorized_count > 0 {
+                    (
+                        format!("{authorized_count} USB LISTO(S)"),
+                        STATUS_GREEN,
+                        STATUS_GREEN_BG,
+                    )
+                } else if !self.local_adb_devices.is_empty()
+                    || !self.detected_usb_mobiles.is_empty()
+                {
+                    ("AUTORIZACIÓN PENDIENTE".to_string(), STATUS_AMBER, STATUS_AMBER_BG)
+                } else {
+                    ("ESPERANDO CABLE USB".to_string(), TEXT_SECONDARY, BG_RECESSED)
+                };
+
+                ui.horizontal(|ui| {
                     Self::draw_brand_mark(ui);
                     ui.vertical(|ui| {
                         ui.horizontal(|ui| {
@@ -1452,6 +1686,12 @@ impl eframe::App for AgentGuiApp {
                                 BORDER_ACCENT,
                                 Color32::from_rgb(12, 45, 72),
                             );
+                            Self::pill_badge(
+                                ui,
+                                &format!("● {status_txt}"),
+                                status_fg,
+                                status_bg,
+                            );
                         });
                         ui.label(
                             RichText::new(format!(
@@ -1465,7 +1705,14 @@ impl eframe::App for AgentGuiApp {
 
                     ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                         if ui
-                            .add_sized([120.0, 32.0], egui::Button::new(RichText::new("Actualizar USB").size(TYPO_BUTTON).strong()))
+                            .add_sized(
+                                [108.0, 30.0],
+                                egui::Button::new(
+                                    RichText::new("⟳ Actualizar")
+                                        .size(TYPO_LABEL)
+                                        .strong(),
+                                ),
+                            )
                             .clicked()
                         {
                             self.trigger_hardware_scan(false);
@@ -1473,7 +1720,10 @@ impl eframe::App for AgentGuiApp {
                         }
 
                         if ui
-                            .add_sized([90.0, 32.0], egui::Button::new(RichText::new("Aislar Red").size(TYPO_BUTTON)))
+                            .add_sized(
+                                [85.0, 30.0],
+                                egui::Button::new(RichText::new("🛡️ Aislar").size(TYPO_LABEL)),
+                            )
                             .on_hover_text("Desconecta endpoints externos y muestra solo USB físico")
                             .clicked()
                         {
@@ -1481,33 +1731,6 @@ impl eframe::App for AgentGuiApp {
                             self.status_message =
                                 "Sesiones externas limpiadas. Solo USB físico activo.".to_string();
                         }
-
-                        let authorized_count = self
-                            .local_adb_devices
-                            .iter()
-                            .filter(|d| d.state == AdbDeviceState::Device)
-                            .count();
-
-                        let (status_txt, status_col) = if authorized_count > 0 {
-                            (
-                                format!("{authorized_count} USB LISTO(S)"),
-                                STATUS_GREEN,
-                            )
-                        } else if !self.local_adb_devices.is_empty()
-                            || !self.detected_usb_mobiles.is_empty()
-                        {
-                            ("AUTORIZACIÓN PENDIENTE".to_string(), STATUS_AMBER)
-                        } else {
-                            ("ESPERANDO CABLE USB".to_string(), TEXT_SECONDARY)
-                        };
-
-                        ui.label(
-                            RichText::new(status_txt)
-                                .size(TYPO_LABEL)
-                                .strong()
-                                .color(status_col),
-                        );
-                        Self::draw_status_dot(ui, status_col);
                     });
                 });
             });
@@ -1542,8 +1765,8 @@ impl eframe::App for AgentGuiApp {
         // 3. LEFT RESIZABLE & SCROLLABLE CREDENTIALS PANEL
         Panel::left("client_left_panel")
             .resizable(true)
-            .default_size(285.0)
-            .size_range(240.0..=380.0)
+            .default_size(320.0)
+            .size_range(280.0..=420.0)
             .frame(
                 Frame::new()
                     .fill(BG_CANVAS)
@@ -1568,12 +1791,24 @@ impl eframe::App for AgentGuiApp {
 }
 
 pub fn run_agent_native_gui() -> Result<(), eframe::Error> {
+    let icon_data = eframe::icon_data::from_png_bytes(include_bytes!(
+        "../../../logos/files/ADBHUB-LINK-icono-256-oscuro.png"
+    ))
+    .ok()
+    .map(std::sync::Arc::new);
+
+    let mut viewport = egui::ViewportBuilder::default()
+        .with_inner_size([1040.0, 680.0])
+        .with_min_inner_size([640.0, 420.0])
+        .with_maximized(true)
+        .with_title("ADBHUB-LINK — Estación del Cliente");
+
+    if let Some(icon) = icon_data {
+        viewport = viewport.with_icon(icon);
+    }
+
     let native_options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default()
-            .with_inner_size([1040.0, 680.0])
-            .with_min_inner_size([640.0, 420.0])
-            .with_maximized(true)
-            .with_title("ADBHUB-LINK — Estación del Cliente"),
+        viewport,
         ..Default::default()
     };
 

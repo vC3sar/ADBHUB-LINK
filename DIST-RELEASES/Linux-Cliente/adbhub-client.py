@@ -433,6 +433,15 @@ def start_gui(code, local_ip):
         root.minsize(680, 440)
         root.configure(bg="#090d16")
 
+        # Ícono oficial de la ventana
+        icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ADBHUB-LINK.png")
+        if os.path.exists(icon_path):
+            try:
+                icon_img = tk.PhotoImage(file=icon_path)
+                root.iconphoto(True, icon_img)
+            except Exception:
+                pass
+
         # Iniciar maximizado (sin pantalla completa invasiva, conservando barra de título estándar)
         try:
             root.state("zoomed")
@@ -517,6 +526,16 @@ def start_gui(code, local_ip):
 
         title_frame = tk.Frame(top_bar, bg=BG_HEADER)
         title_frame.pack(side="left")
+
+        # Logo oficial en la barra superior
+        if os.path.exists(icon_path):
+            try:
+                logo_img = tk.PhotoImage(file=icon_path).subsample(8, 8)  # 256 / 8 = 32x32
+                logo_lbl = tk.Label(title_frame, image=logo_img, bg=BG_HEADER)
+                logo_lbl.image = logo_img
+                logo_lbl.pack(side="left", padx=(0, 10))
+            except Exception:
+                pass
 
         tk.Label(
             title_frame,

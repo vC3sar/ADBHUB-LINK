@@ -13,8 +13,8 @@ use std::time::Instant;
 use adbhub_core::{AdbDeviceInfo, AdbDeviceState, AdbEngine, AnyDeskCode};
 use adbhub_desktop::DesktopController;
 use eframe::egui::{
-    self, Align, CentralPanel, Color32, CornerRadius, FontData, FontDefinitions, FontFamily, Frame,
-    Layout, Margin, Panel, Pos2, RichText, ScrollArea, Sense, Stroke, Vec2,
+    self, Align, Align2, CentralPanel, Color32, CornerRadius, FontData, FontDefinitions, FontFamily, Frame,
+    Layout, Margin, Panel, Pos2, Rect, RichText, ScrollArea, Sense, Stroke, Vec2,
 };
 use tokio::runtime::Runtime;
 
@@ -117,6 +117,9 @@ pub enum GuiAsyncEvent {
     ServerDevicesUpdated {
         devices: Vec<AdbDeviceInfo>,
     },
+    TelemetryUpdated {
+        telemetry: ExtendedTelemetry,
+    },
     CommandResult {
         output: String,
     },
@@ -165,11 +168,8 @@ impl DesktopGuiApp {
             _rt: rt,
             _controller: controller,
             active_nav: TechNavTab::Dashboard,
-            input_code: "192.168.1.83:5555".to_string(),
-            recent_endpoints: vec![
-                "192.168.1.83:5555".to_string(),
-                "127.0.0.1:5555".to_string(),
-            ],
+            input_code: String::new(),
+            recent_endpoints: Vec::new(),
             state: TechConnectionState::Disconnected,
             telemetry: ExtendedTelemetry::default(),
             server_devices: Vec::new(),
@@ -314,25 +314,36 @@ impl DesktopGuiApp {
     }
 
     fn extract_telemetry(props: &HashMap<String, String>) -> ExtendedTelemetry {
+        let abi = props
+            .get("ro.product.cpu.abi")
+            .or_else(|| props.get("ro.product.cpu.abilist"))
+            .filter(|s| !s.is_empty())
+            .cloned()
+            .unwrap_or_else(|| "arm64-v8a".to_string());
+        let soc = props
+            .get("ro.board.platform")
+            .or_else(|| props.get("ro.hardware"))
+            .or_else(|| props.get("ro.soc.manufacturer"))
+            .filter(|s| !s.is_empty())
+            .cloned()
+            .unwrap_or_else(|| "ARM64".to_string());
+        let sdk = props
+            .get("ro.build.version.sdk")
+            .filter(|s| !s.is_empty())
+            .cloned()
+            .unwrap_or_else(|| "35".to_string());
+        let build = props
+            .get("ro.build.display.id")
+            .or_else(|| props.get("ro.build.id"))
+            .filter(|s| !s.is_empty())
+            .cloned()
+            .unwrap_or_else(|| "Release Oficial".to_string());
+
         ExtendedTelemetry {
-            cpu_abi: props
-                .get("ro.product.cpu.abi")
-                .cloned()
-                .unwrap_or_else(|| "arm64-v8a".to_string()),
-            soc_platform: props
-                .get("ro.board.platform")
-                .or_else(|| props.get("ro.hardware"))
-                .cloned()
-                .unwrap_or_else(|| "SoC Android".to_string()),
-            sdk_int: props
-                .get("ro.build.version.sdk")
-                .cloned()
-                .unwrap_or_else(|| "N/D".to_string()),
-            build_id: props
-                .get("ro.build.display.id")
-                .or_else(|| props.get("ro.build.id"))
-                .cloned()
-                .unwrap_or_else(|| "N/D".to_string()),
+            cpu_abi: abi,
+            soc_platform: soc,
+            sdk_int: sdk,
+            build_id: build,
         }
     }
 
@@ -599,28 +610,55 @@ impl DesktopGuiApp {
     }
 
     fn draw_brand_mark(ui: &mut egui::Ui) {
-        let (rect, _) = ui.allocate_exact_size(Vec2::new(28.0, 28.0), Sense::hover());
+        let size = 30.0;
+        let (rect, _) = ui.allocate_exact_size(Vec2::splat(size), Sense::hover());
         let painter = ui.painter();
-        painter.rect_filled(rect, CornerRadius::same(6), ACCENT_BLUE_DARK);
+
+        // Fondo squircle oscuro oficial #0A0B10
+        let corner_r = 7;
+        painter.rect_filled(rect, CornerRadius::same(corner_r), Color32::from_rgb(10, 11, 16));
         painter.rect_stroke(
             rect,
-            CornerRadius::same(6),
-            Stroke::new(1.0, BORDER_ACCENT),
+            CornerRadius::same(corner_r),
+            Stroke::new(1.0, Color32::from_rgb(38, 56, 84)),
             egui::StrokeKind::Inside,
         );
-        let c = rect.center();
-        let p_left = Pos2::new(c.x - 6.0, c.y);
-        let p_right = Pos2::new(c.x + 6.0, c.y);
-        let p_top = Pos2::new(c.x + 1.0, c.y - 5.0);
-        let p_bot = Pos2::new(c.x + 1.0, c.y + 5.0);
-        let stroke = Stroke::new(1.8, Color32::WHITE);
-        painter.line_segment([p_left, p_right], stroke);
-        painter.line_segment([p_left, p_top], stroke);
-        painter.line_segment([p_left, p_bot], stroke);
-        painter.circle_filled(p_left, 2.5, BORDER_ACCENT);
-        painter.circle_filled(p_right, 2.5, Color32::WHITE);
-        painter.circle_filled(p_top, 2.0, Color32::WHITE);
-        painter.circle_filled(p_bot, 2.0, Color32::WHITE);
+
+        let rx = rect.min.x;
+        let ry = rect.min.y;
+
+        // Pilar izquierdo oficial (Blanco)
+        let pillar_w = 2.6;
+        let pillar_h = 15.2;
+        let left_pillar = Rect::from_min_size(
+            Pos2::new(rx + 7.8, ry + 7.4),
+            Vec2::new(pillar_w, pillar_h),
+        );
+        painter.rect_filled(left_pillar, CornerRadius::same(1), Color32::WHITE);
+
+        // Pilar derecho oficial (Blanco)
+        let right_pillar = Rect::from_min_size(
+            Pos2::new(rx + 19.6, ry + 7.4),
+            Vec2::new(pillar_w, pillar_h),
+        );
+        painter.rect_filled(right_pillar, CornerRadius::same(1), Color32::WHITE);
+
+        // Conector de puente izquierdo (Blanco)
+        let left_notch = Rect::from_min_size(
+            Pos2::new(rx + 9.9, ry + 13.9),
+            Vec2::new(2.5, 2.2),
+        );
+        painter.rect_filled(left_notch, CornerRadius::ZERO, Color32::WHITE);
+
+        // Conector de puente derecho (Blanco)
+        let right_notch = Rect::from_min_size(
+            Pos2::new(rx + 17.5, ry + 13.9),
+            Vec2::new(2.5, 2.2),
+        );
+        painter.rect_filled(right_notch, CornerRadius::ZERO, Color32::WHITE);
+
+        // Nodo central de conexion #9A8CFF
+        painter.circle_filled(rect.center(), 2.4, Color32::from_rgb(154, 140, 255));
     }
 
     fn pill_badge(ui: &mut egui::Ui, text: &str, fg: Color32, bg: Color32) {
@@ -752,16 +790,32 @@ impl DesktopGuiApp {
                                         .strong()
                                         .color(Color32::WHITE),
                                 );
-                                if ui
-                                    .button(
-                                        RichText::new("Ver QR / Compartir")
-                                            .size(TYPO_LABEL)
-                                            .color(BORDER_ACCENT),
-                                    )
-                                    .clicked()
-                                {
-                                    self.active_nav = TechNavTab::ApkQr;
-                                }
+                                ui.horizontal(|ui| {
+                                    if ui
+                                        .button(
+                                            RichText::new("Ver QR")
+                                                .size(TYPO_LABEL)
+                                                .color(BORDER_ACCENT),
+                                        )
+                                        .clicked()
+                                    {
+                                        self.active_nav = TechNavTab::ApkQr;
+                                    }
+                                    if ui
+                                        .button(
+                                            RichText::new("Copiar Enlace")
+                                                .size(TYPO_LABEL)
+                                                .color(STATUS_GREEN),
+                                        )
+                                        .clicked()
+                                    {
+                                        ui.ctx().copy_text(APK_RELEASE_URL.to_string());
+                                        self.last_action_message = Some((
+                                            Instant::now(),
+                                            "Enlace APK copiado al portapapeles.".to_string(),
+                                        ));
+                                    }
+                                });
                             });
                         });
                     });
@@ -780,13 +834,13 @@ impl DesktopGuiApp {
                                     (STATUS_GREEN, "ENLACE ACTIVO")
                                 }
                                 TechConnectionState::Connecting => (STATUS_AMBER, "CONECTANDO..."),
-                                _ => (TEXT_SECONDARY, "SERVIDOR LISTO"),
+                                _ => (STATUS_GREEN, "SERVIDOR LOCAL ADB"),
                             };
                             Self::draw_status_dot(ui, col);
                             ui.label(RichText::new(txt).size(TYPO_LABEL).strong().color(col));
                         });
                         ui.label(
-                            RichText::new("127.0.0.1:5037")
+                            RichText::new("127.0.0.1:5037 • Listo")
                                 .size(TYPO_BODY_SMALL)
                                 .monospace()
                                 .color(TEXT_MUTED),
@@ -804,15 +858,15 @@ impl DesktopGuiApp {
     ) {
         let active = *current == target;
         let fill = if active {
-            Color32::from_rgb(20, 42, 74)
+            Color32::from_rgb(20, 48, 82)
         } else {
             BG_CARD
         };
-        let border = if active { ACCENT_BLUE } else { BORDER_SUBTLE };
+        let border = if active { BORDER_ACCENT } else { BORDER_SUBTLE };
 
         let resp = Frame::new()
             .fill(fill)
-            .stroke(Stroke::new(1.0, border))
+            .stroke(Stroke::new(if active { 1.5 } else { 1.0 }, border))
             .corner_radius(CornerRadius::same(RADIUS_SMALL))
             .inner_margin(Margin::symmetric(SPACE_3 as i8, SPACE_2 as i8))
             .show(ui, |ui| {
@@ -825,15 +879,64 @@ impl DesktopGuiApp {
                             .color(if active { Color32::WHITE } else { TEXT_PRIMARY }),
                     );
                     ui.add_space(1.0);
-                    ui.label(RichText::new(subtitle).size(TYPO_LABEL).color(TEXT_MUTED));
+                    ui.label(
+                        RichText::new(subtitle)
+                            .size(TYPO_LABEL)
+                            .color(if active { BORDER_ACCENT } else { TEXT_MUTED }),
+                    );
                 });
             })
             .response
             .interact(Sense::click());
 
+        if resp.hovered() {
+            ui.ctx().set_cursor_icon(egui::CursorIcon::PointingHand);
+        }
         if resp.clicked() {
             *current = target;
         }
+    }
+
+    fn read_clipboard_text() -> Option<String> {
+        #[cfg(windows)]
+        {
+            use std::ffi::c_void;
+            #[link(name = "user32")]
+            extern "system" {
+                fn OpenClipboard(hWndNewOwner: *mut c_void) -> i32;
+                fn CloseClipboard() -> i32;
+                fn GetClipboardData(uFormat: u32) -> *mut c_void;
+            }
+            #[link(name = "kernel32")]
+            extern "system" {
+                fn GlobalLock(hMem: *mut c_void) -> *mut c_void;
+                fn GlobalUnlock(hMem: *mut c_void) -> i32;
+            }
+
+            const CF_UNICODETEXT: u32 = 13;
+
+            unsafe {
+                if OpenClipboard(std::ptr::null_mut()) != 0 {
+                    let handle = GetClipboardData(CF_UNICODETEXT);
+                    if !handle.is_null() {
+                        let ptr = GlobalLock(handle) as *const u16;
+                        if !ptr.is_null() {
+                            let mut len = 0;
+                            while *ptr.add(len) != 0 {
+                                len += 1;
+                            }
+                            let slice = std::slice::from_raw_parts(ptr, len);
+                            let s = String::from_utf16_lossy(slice);
+                            GlobalUnlock(handle);
+                            CloseClipboard();
+                            return Some(s);
+                        }
+                    }
+                    CloseClipboard();
+                }
+            }
+        }
+        None
     }
 
     fn render_connection_header(
@@ -876,21 +979,21 @@ impl DesktopGuiApp {
                         if let TechConnectionState::Connected { device } = &self.state {
                             Self::pill_badge(
                                 ui,
-                                &format!("CONECTADO: {}", device.serial),
+                                &format!("● CONECTADO: {}", device.serial),
                                 STATUS_GREEN,
                                 STATUS_GREEN_BG,
                             );
                         } else if is_connecting {
                             Self::pill_badge(
                                 ui,
-                                "RESOLVIENDO TÚNEL...",
+                                "● RESOLVIENDO TÚNEL...",
                                 STATUS_AMBER,
                                 Color32::from_rgb(60, 40, 10),
                             );
                         } else {
                             Self::pill_badge(
                                 ui,
-                                "LISTO PARA CONEXIÓN",
+                                "● LISTO PARA CONEXIÓN",
                                 ACCENT_BLUE,
                                 Color32::from_rgb(10, 30, 55),
                             );
@@ -919,7 +1022,6 @@ impl DesktopGuiApp {
                         ui.set_width(ui.available_width());
 
                         ui.horizontal(|ui| {
-                            // Icono visual de enlace o llave
                             ui.label(
                                 RichText::new("ID / IP")
                                     .size(TYPO_LABEL)
@@ -929,19 +1031,18 @@ impl DesktopGuiApp {
 
                             ui.add_space(SPACE_2);
 
-                            // Campo de texto grande y de alto contraste
                             let avail = ui.available_width();
                             let reserve_w = if is_connecting {
-                                180.0
+                                190.0
                             } else if is_connected {
-                                280.0
+                                300.0
                             } else {
-                                250.0
+                                290.0
                             };
                             let input_w = (avail - reserve_w).max(200.0);
 
                             let text_edit = egui::TextEdit::singleline(&mut self.input_code)
-                                .hint_text("Pegue aquí el Código (ej. 8924-BE29-19BC-30DB) o IP:5555")
+                                .hint_text("Pegue aquí el Código AnyDesk (ej. 8924-BE29-19B1-9B69) o IP:5555")
                                 .font(egui::FontId::new(TYPO_INPUT, FontFamily::Monospace))
                                 .text_color(TEXT_PRIMARY);
 
@@ -950,24 +1051,26 @@ impl DesktopGuiApp {
                             // Botón de pegar desde el portapapeles
                             let paste_btn = ui.add(
                                 egui::Button::new(
-                                    RichText::new("Pegar")
+                                    RichText::new("📋 Pegar")
                                         .size(TYPO_BUTTON)
                                         .strong()
                                         .color(BORDER_ACCENT),
                                 )
                                 .fill(Color32::from_rgb(20, 32, 50))
                                 .stroke(Stroke::new(1.0, Color32::from_rgb(40, 60, 90)))
-                                .min_size(Vec2::new(64.0, 36.0)),
+                                .min_size(Vec2::new(76.0, 36.0)),
                             );
 
                             if paste_btn.clicked() {
-                                let clip = ui.input(|i| {
-                                    i.events.iter().find_map(|e| {
-                                        if let egui::Event::Paste(s) = e {
-                                            Some(s.clone())
-                                        } else {
-                                            None
-                                        }
+                                let clip = Self::read_clipboard_text().or_else(|| {
+                                    ui.input(|i| {
+                                        i.events.iter().find_map(|e| {
+                                            if let egui::Event::Paste(s) = e {
+                                                Some(s.clone())
+                                            } else {
+                                                None
+                                            }
+                                        })
                                     })
                                 });
                                 if let Some(text) = clip {
@@ -982,8 +1085,8 @@ impl DesktopGuiApp {
                             if !self.input_code.is_empty() {
                                 let clear_btn = ui.add(
                                     egui::Button::new(
-                                        RichText::new("x")
-                                            .size(TYPO_BODY_LARGE)
+                                        RichText::new("✕")
+                                            .size(TYPO_BODY)
                                             .strong()
                                             .color(TEXT_MUTED),
                                     )
@@ -1215,9 +1318,19 @@ impl DesktopGuiApp {
                         self.telemetry.soc_platform.clone()
                     };
                     let build_str = if self.telemetry.build_id.is_empty() {
-                        "Release".to_string()
+                        "Release Oficial".to_string()
                     } else {
                         self.telemetry.build_id.clone()
+                    };
+                    let sdk_str = if self.telemetry.sdk_int.is_empty() {
+                        "API 35".to_string()
+                    } else {
+                        format!("SDK {}", self.telemetry.sdk_int)
+                    };
+                    let abi_str = if self.telemetry.cpu_abi.is_empty() {
+                        "ABI: arm64-v8a".to_string()
+                    } else {
+                        format!("ABI: {}", self.telemetry.cpu_abi)
                     };
 
                     if wide {
@@ -1244,7 +1357,7 @@ impl DesktopGuiApp {
                                 &mut cols[2],
                                 "VERSIÓN ANDROID",
                                 device.android_version.as_deref().unwrap_or("Android OS"),
-                                &format!("SDK: {}", self.telemetry.sdk_int),
+                                &sdk_str,
                                 Color32::WHITE,
                             );
                             Self::spec_card(
@@ -1261,7 +1374,7 @@ impl DesktopGuiApp {
                                 &mut cols[0],
                                 "PLATAFORMA / SOC",
                                 &soc_str,
-                                &format!("ABI: {}", self.telemetry.cpu_abi),
+                                &abi_str,
                                 Color32::WHITE,
                             );
                             Self::spec_card(
@@ -1309,7 +1422,7 @@ impl DesktopGuiApp {
                                 &mut cols[0],
                                 "VERSIÓN ANDROID",
                                 device.android_version.as_deref().unwrap_or("Android OS"),
-                                &format!("SDK: {}", self.telemetry.sdk_int),
+                                &sdk_str,
                                 Color32::WHITE,
                             );
                             Self::spec_card(
@@ -1354,6 +1467,7 @@ impl DesktopGuiApp {
                         ui.columns(4, |cols| {
                             if Self::mode_action_card(
                                 &mut cols[0],
+                                "🔄",
                                 "Reinicio Normal",
                                 "adb reboot",
                                 ACCENT_BLUE,
@@ -1362,6 +1476,7 @@ impl DesktopGuiApp {
                             }
                             if Self::mode_action_card(
                                 &mut cols[1],
+                                "🛠️",
                                 "Modo Recovery",
                                 "adb reboot recovery",
                                 STATUS_AMBER,
@@ -1370,6 +1485,7 @@ impl DesktopGuiApp {
                             }
                             if Self::mode_action_card(
                                 &mut cols[2],
+                                "⚡",
                                 "Fastboot / Bootloader",
                                 "adb reboot bootloader",
                                 BORDER_ACCENT,
@@ -1378,6 +1494,7 @@ impl DesktopGuiApp {
                             }
                             if Self::mode_action_card(
                                 &mut cols[3],
+                                "🚨",
                                 "Qualcomm EDL 9008",
                                 "adb reboot edl",
                                 STATUS_RED,
@@ -1389,6 +1506,7 @@ impl DesktopGuiApp {
                         ui.columns(2, |cols| {
                             if Self::mode_action_card(
                                 &mut cols[0],
+                                "🔄",
                                 "Reinicio Normal",
                                 "adb reboot",
                                 ACCENT_BLUE,
@@ -1397,6 +1515,7 @@ impl DesktopGuiApp {
                             }
                             if Self::mode_action_card(
                                 &mut cols[1],
+                                "🛠️",
                                 "Modo Recovery",
                                 "adb reboot recovery",
                                 STATUS_AMBER,
@@ -1408,6 +1527,7 @@ impl DesktopGuiApp {
                         ui.columns(2, |cols| {
                             if Self::mode_action_card(
                                 &mut cols[0],
+                                "⚡",
                                 "Fastboot / Bootloader",
                                 "adb reboot bootloader",
                                 BORDER_ACCENT,
@@ -1416,6 +1536,7 @@ impl DesktopGuiApp {
                             }
                             if Self::mode_action_card(
                                 &mut cols[1],
+                                "🚨",
                                 "Qualcomm EDL 9008",
                                 "adb reboot edl",
                                 STATUS_RED,
@@ -1453,36 +1574,83 @@ impl DesktopGuiApp {
             ui.add_space(SPACE_2);
         }
 
-        // COMPACT LIVE TERMINAL IN DASHBOARD
-        self.render_terminal_widget(ui, 160.0);
+        // COMPACT LIVE TERMINAL IN DASHBOARD (Optimized height so input is always visible)
+        self.render_terminal_widget(ui, 75.0);
     }
 
-    fn mode_action_card(ui: &mut egui::Ui, title: &str, cmd_sub: &str, accent: Color32) -> bool {
-        let resp = Frame::new()
-            .fill(BG_RECESSED)
-            .stroke(Stroke::new(1.0, BORDER_SUBTLE))
-            .corner_radius(CornerRadius::same(RADIUS_SMALL))
-            .inner_margin(Margin::symmetric(SPACE_3 as i8, SPACE_2 as i8))
-            .show(ui, |ui| {
-                ui.set_width(ui.available_width());
-                ui.vertical(|ui| {
-                    ui.label(RichText::new(title).size(TYPO_BODY).strong().color(accent));
-                    ui.add_space(2.0);
-                    ui.label(
-                        RichText::new(cmd_sub)
-                            .size(TYPO_LABEL)
-                            .monospace()
-                            .color(TEXT_MUTED),
-                    );
-                });
-            })
-            .response
-            .interact(Sense::click());
+    fn mode_action_card(
+        ui: &mut egui::Ui,
+        icon: &str,
+        title: &str,
+        cmd_sub: &str,
+        accent: Color32,
+    ) -> bool {
+        let (rect, response) = ui.allocate_exact_size(
+            Vec2::new(ui.available_width(), 52.0),
+            Sense::click(),
+        );
 
-        if resp.hovered() {
+        let is_hovered = response.hovered();
+        let bg = if is_hovered {
+            Color32::from_rgba_unmultiplied(accent.r(), accent.g(), accent.b(), 35)
+        } else {
+            Color32::from_rgb(14, 20, 32)
+        };
+        let border = if is_hovered {
+            accent
+        } else {
+            Color32::from_rgb(32, 45, 66)
+        };
+
+        let painter = ui.painter();
+        painter.rect_filled(rect, CornerRadius::same(6), bg);
+        painter.rect_stroke(
+            rect,
+            CornerRadius::same(6),
+            Stroke::new(if is_hovered { 1.5 } else { 1.0 }, border),
+            egui::StrokeKind::Inside,
+        );
+
+        let icon_rect = egui::Rect::from_min_size(
+            Pos2::new(rect.min.x + 8.0, rect.center().y - 14.0),
+            Vec2::new(28.0, 28.0),
+        );
+        painter.rect_filled(
+            icon_rect,
+            CornerRadius::same(4),
+            Color32::from_rgba_unmultiplied(accent.r(), accent.g(), accent.b(), 45),
+        );
+        painter.text(
+            icon_rect.center(),
+            Align2::CENTER_CENTER,
+            icon,
+            egui::FontId::proportional(15.0),
+            Color32::WHITE,
+        );
+
+        let text_x = rect.min.x + 44.0;
+        let title_pos = Pos2::new(text_x, rect.min.y + 10.0);
+        painter.text(
+            title_pos,
+            Align2::LEFT_TOP,
+            title,
+            egui::FontId::proportional(14.0),
+            if is_hovered { Color32::WHITE } else { TEXT_PRIMARY },
+        );
+
+        let sub_pos = Pos2::new(text_x, rect.min.y + 28.0);
+        painter.text(
+            sub_pos,
+            Align2::LEFT_TOP,
+            cmd_sub,
+            egui::FontId::monospace(12.0),
+            if is_hovered { accent } else { TEXT_MUTED },
+        );
+
+        if is_hovered {
             ui.ctx().set_cursor_icon(egui::CursorIcon::PointingHand);
         }
-        resp.clicked()
+        response.clicked()
     }
 
     fn render_terminal_pro_tab(&mut self, ui: &mut egui::Ui) {
@@ -2149,9 +2317,26 @@ impl eframe::App for DesktopGuiApp {
                         format!("Fallo de conexión hacia [{target_endpoint}]: {error}"),
                     ));
                 }
+                GuiAsyncEvent::TelemetryUpdated { telemetry } => {
+                    self.telemetry = telemetry;
+                }
                 GuiAsyncEvent::ServerDevicesUpdated { devices } => {
                     self.server_poll_in_flight = false;
+                    let had_no_telemetry = self.telemetry.sdk_int.is_empty();
+                    let first_serial = devices.first().map(|d| d.serial.clone());
                     self.server_devices = devices;
+
+                    if had_no_telemetry {
+                        if let Some(ser) = first_serial {
+                            let tx = self.event_tx.clone();
+                            let adb = self.adb;
+                            std::thread::spawn(move || {
+                                let props = adb.get_device_props(&ser).unwrap_or_default();
+                                let telemetry = Self::extract_telemetry(&props);
+                                let _ = tx.send(GuiAsyncEvent::TelemetryUpdated { telemetry });
+                            });
+                        }
+                    }
                 }
                 GuiAsyncEvent::CommandResult { output } => {
                     self.is_command_running = false;
@@ -2203,8 +2388,8 @@ impl eframe::App for DesktopGuiApp {
         // 1. LEFT RESIZABLE & SCROLLABLE SIDEBAR PANEL
         Panel::left("tech_left_sidebar")
             .resizable(true)
-            .default_size(205.0)
-            .size_range(175.0..=270.0)
+            .default_size(235.0)
+            .size_range(210.0..=320.0)
             .frame(
                 Frame::new()
                     .fill(BG_SIDEBAR)
@@ -2335,12 +2520,24 @@ pub fn run_desktop_native_gui(
     rt: Arc<Runtime>,
     controller: Arc<DesktopController>,
 ) -> Result<(), eframe::Error> {
+    let icon_data = eframe::icon_data::from_png_bytes(include_bytes!(
+        "../../../logos/files/ADBHUB-LINK-icono-256-oscuro.png"
+    ))
+    .ok()
+    .map(std::sync::Arc::new);
+
+    let mut viewport = egui::ViewportBuilder::default()
+        .with_inner_size([1180.0, 720.0])
+        .with_min_inner_size([720.0, 480.0])
+        .with_maximized(true)
+        .with_title("ADBHUB-LINK — Estación del Técnico");
+
+    if let Some(icon) = icon_data {
+        viewport = viewport.with_icon(icon);
+    }
+
     let native_options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default()
-            .with_inner_size([1180.0, 720.0])
-            .with_min_inner_size([720.0, 480.0])
-            .with_maximized(true)
-            .with_title("ADBHUB-LINK — Estación del Técnico"),
+        viewport,
         ..Default::default()
     };
 
